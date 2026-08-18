@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #0B8F68;
+  --color-brand-deep: #07634B;
+  --color-brand-darkest: #173A30;
+  --color-brand-accent: #A8F24A;
+  
+  --color-surface-default: #FFFFFF;
+  --color-surface-alt: #F9FBFA;
+  --color-surface-muted: #F0F7F3;
+  
+  --color-status-success: #0B8F68;
+  --color-status-warning: #F59E0B;
+  --color-status-danger: #EF4444;
+  --color-status-info: #3B82F6;
+  
+  --color-text-primary: #0F1A15;
+  --color-text-secondary: #4A5E54;
+  --color-text-muted: #6B7A6F;
+  --color-text-placeholder: #9AAEA3;
+  --color-text-hairline: #C8D5CC;
+  
+  --color-border-main: rgba(11, 143, 104, 0.10);
+  --color-border-card: #E8EDEA;
+  --color-border-divider: #F0F5F2;
+  --color-border-glass: rgba(255, 255, 255, 0.75);
+  
+  --shadow-sidebar: 0 4px 32px rgba(11,143,104,0.09), 0 1px 0 rgba(11,143,104,0.04), inset 0 1px 0 rgba(255,255,255,0.6);
+  --shadow-card: 0 8px 24px rgba(11,143,104,0.05);
+  --shadow-button: 0 2px 8px rgba(11,143,104,0.28);
+  --shadow-button-primary: 0 4px 16px rgba(11,143,104,0.35);
+}
+
+@layer base {
+  :root {
+    --background: #F5F7F5;
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--color-text-primary);
+    font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .font-mono {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+  }
+}
