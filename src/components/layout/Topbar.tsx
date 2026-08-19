@@ -59,7 +59,7 @@ export function Topbar() {
         </div>
         <input
           type="text"
-          className="block w-full py-2 pl-[32px] pr-12 rounded-xl border border-border-main bg-white/85 text-[12px] font-medium font-geist placeholder:text-text-placeholder focus:outline-none focus:border-brand-primary/40 focus:ring-1 focus:ring-brand-primary/10 transition-colors"
+          className="block w-full py-2 pl-[32px] pr-12 rounded-4xl border border-border-main bg-white/85 text-[12px] font-medium font-geist placeholder:text-text-placeholder focus:outline-none focus:border-brand-primary/40 focus:ring-1 focus:ring-brand-primary/10 transition-colors"
           placeholder="Rechercher un produit, une vente..."
         />
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -75,9 +75,9 @@ export function Topbar() {
         <div className="relative" ref={popoverRef}>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white hover:shadow-sm transition-all text-text-secondary text-[12px] font-medium border border-border-main cursor-pointer select-none"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-4xl bg-white hover:shadow-sm transition-all text-text-secondary text-[12px] font-medium border border-border-main cursor-pointer select-none"
           >
-            <CalendarIcon size={15} className="text-brand-primary" />
+            <CalendarIcon size={12} className="text-brand-primary" />
             <span>{formattedLabel}</span>
             <ChevronDown
               size={14}
@@ -123,8 +123,8 @@ export function Topbar() {
                       onClick={() => handleSelectMonth(index)}
                       type="button"
                       className={`py-2 text-[11px] font-medium rounded-xl transition-all ${isSelected
-                          ? "bg-brand-primary text-white shadow-sm font-semibold"
-                          : "text-text-secondary hover:bg-surface-muted hover:text-text-main"
+                        ? "bg-brand-primary text-white shadow-sm font-semibold"
+                        : "text-text-secondary hover:bg-surface-muted hover:text-text-main"
                         }`}
                     >
                       {month.slice(0, 4)}
@@ -137,13 +137,13 @@ export function Topbar() {
         </div>
 
         {/* Notifications */}
-        <button className="relative p-2 rounded-full hover:bg-white hover:text-brand-primary transition-colors text-text-secondary border border-transparent hover:border-border-main">
+        <button className="relative p-2 rounded-full hover:bg-white hover:text-brand-primary transition-colors text-text-secondary border border-border-main">
           <Bell size={16} />
           <span className="absolute top-1.5 right-1.5 block w-2 h-2 rounded-full bg-status-danger border-2 border-white"></span>
         </button>
 
         {/* New Sale CTA */}
-        <button className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-primary text-white rounded-xl text-[12px] font-bold shadow-button hover:bg-brand-deep active:scale-95 transition-all">
+        <button className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-primary text-white rounded-4xl text-[12px] font-bold shadow-button hover:bg-brand-deep active:scale-95 transition-all">
           <Plus size={14} strokeWidth={3} />
           Nouvelle vente
         </button>

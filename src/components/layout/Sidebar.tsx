@@ -54,7 +54,7 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
       {/* Brand Header */}
       <div className="flex items-center gap-3 p-5">
         <div className="w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center text-white shrink-0">
-          <HeartPulse size={16} fill="white" className="text-white" />
+          <HeartPulse size={15} />
         </div>
         <div>
           <h1 className="text-text-primary text-[14px] font-bold leading-none mb-1 tracking-tight">Magali</h1>
@@ -78,12 +78,12 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 ${isActive
+                    className={`flex items-center gap-3 px-3 py-2 rounded-4xl text-xs font-medium transition-all duration-150 ${isActive
                       ? "bg-brand-primary text-white shadow-button"
                       : "text-text-secondary hover:bg-surface-muted hover:text-brand-primary"
                       }`}
                   >
-                    <item.icon size={16} strokeWidth={isActive ? 2.5 : 2} />
+                    <item.icon size={14} strokeWidth={isActive ? 2.5 : 2} />
                     {item.name}
                     {isActive && (
                       <div className="w-1.5 h-1.5 rounded-full bg-brand-accent ml-auto" />
@@ -103,13 +103,13 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
         <div className="p-3 pt-0">
           <Link
             href="/help"
-            className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl text-[13px] font-medium text-text-secondary hover:bg-surface-muted hover:text-brand-primary transition-colors"
+            className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl text-xs font-medium text-text-secondary hover:bg-surface-muted hover:text-brand-primary transition-colors"
           >
             <Info size={16} />
             Aide & documentation
           </Link>
 
-          <div className="flex items-center justify-between p-3 rounded-xl hover:bg-surface-muted transition-colors cursor-pointer border border-transparent hover:border-border-main group">
+          <div className="flex items-center justify-between p-3 rounded-3xl hover:bg-surface-muted transition-colors cursor-pointer border border-transparent">
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center text-[11px] font-bold shrink-0">
                 {user?.initials || "..."}

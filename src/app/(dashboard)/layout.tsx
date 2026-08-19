@@ -15,10 +15,10 @@ export default async function DashboardLayout({
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar user={user} pharmacy={pharmacy} />
-      
+
       <main className="flex flex-col flex-1 ml-[240px] h-full overflow-hidden">
         <Topbar />
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto">
           {children}
         </div>
       </main>
