@@ -8,8 +8,8 @@ import {
   PaymentMethod,
   Product,
 } from '../../types/pos.types';
-import { generateReceiptHtml } from '../../lib/pdf/generateReceiptHtml';
-import { downloadHtmlFile } from '../../lib/pdf/downloadHtmlFile';
+import { generateReceiptHtml } from '@/src/lib/pdf/generateReceiptHtml';
+import { downloadHtmlFile } from '@/src/lib/pdf/downloadHtmlFile';
 
 export function usePosCart(products: Product[]) {
   const [cart, setCart] = useState<CartItem[]>([]);
