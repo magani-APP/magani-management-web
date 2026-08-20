@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { InventoryFilterLabel, InventoryProduct } from '../types/inventory.types';
+import { useMemo, useRef, useState } from 'react';
+import { InventoryFilterLabel, InventoryProduct } from '../../types/inventory.types';
 
 const FILTER_TO_STATUS: Record<InventoryFilterLabel, InventoryProduct['status'] | null> = {
   Tous: null,
@@ -11,23 +11,37 @@ const FILTER_TO_STATUS: Record<InventoryFilterLabel, InventoryProduct['status'] 
   Expiré: 'expire',
 };
 
+function normalizeString(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
 export function useInventoryCatalog(products: InventoryProduct[]) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<InventoryFilterLabel>('Tous');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const filteredProducts = useMemo(() => {
     const targetStatus = FILTER_TO_STATUS[activeFilter];
-    const query = searchQuery.trim().toLowerCase();
+    const query = normalizeString(searchQuery.trim());
 
     return products.filter((p) => {
       const matchesFilter = !targetStatus || p.status === targetStatus;
-      const matchesSearch =
-        !query ||
-        p.name.toLowerCase().includes(query) ||
-        p.code.toLowerCase().includes(query) ||
-        p.category.toLowerCase().includes(query);
+      if (!matchesFilter) return false;
+      if (!query) return true;
 
-      return matchesFilter && matchesSearch;
+      const nameNormalized = normalizeString(p.name);
+      const codeNormalized = normalizeString(p.code);
+      const categoryNormalized = normalizeString(p.category);
+
+      const matchesSearch =
+        nameNormalized.includes(query) ||
+        codeNormalized.includes(query) ||
+        categoryNormalized.includes(query);
+
+      return matchesSearch;
     });
   }, [products, activeFilter, searchQuery]);
 
@@ -37,5 +51,6 @@ export function useInventoryCatalog(products: InventoryProduct[]) {
     activeFilter,
     setActiveFilter,
     filteredProducts,
+    searchInputRef,
   };
 }

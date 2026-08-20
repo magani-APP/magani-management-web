@@ -1,4 +1,4 @@
-import { InventoryProduct, InventoryStats } from '../features/inventory/types/inventory.types';
+import { InventoryProduct, InventoryStats } from '../types/inventory.types';
 
 export const mockInventoryProducts: InventoryProduct[] = [
   {

@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { X, Pen, Plus, Archive, Activity } from 'lucide-react';
-import { TOKENS } from '../../../constants/design-tokens.constants';
-import { InventoryProduct } from '../types/inventory.types';
-import { STATUS_CONFIG, MOVEMENT_LABELS } from '../constants/inventory.constants';
-import { formatPrice, formatDate, formatShortDate } from '../utils/format.util';
+import { TOKENS } from '@/src/constants/design-tokens.constants';
+import { InventoryProduct } from '@/src/types/inventory.types';
+import { STATUS_CONFIG, MOVEMENT_LABELS } from '@/src/constants/inventory.constants';
+import { formatPrice, formatDate, formatShortDate } from '@/src/utils/format.util';
 import { ProductAvatar } from './ProductAvatar';
 
 interface ProductDetailDrawerProps {

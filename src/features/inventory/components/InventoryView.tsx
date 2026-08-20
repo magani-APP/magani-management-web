@@ -17,12 +17,12 @@ import {
   MoreHorizontal,
   Pill,
 } from 'lucide-react';
-import { TOKENS } from '../../../constants/design-tokens.constants';
-import { INVENTORY_FILTERS, STATUS_CONFIG } from '../constants/inventory.constants';
-import { formatPrice, formatDate, formatCompactCFA } from '../utils/format.util';
-import { useInventoryProducts } from '../hooks/useInventoryProducts';
-import { useInventoryCatalog } from '../hooks/useInventoryCatalog';
-import { ProductDetailDrawer } from './ProductDetailDrawer';
+import { TOKENS } from '@/src/constants/design-tokens.constants';
+import { INVENTORY_FILTERS, STATUS_CONFIG } from '@/src/constants/inventory.constants';
+import { formatPrice, formatDate, formatCompactCFA } from '@/src/utils/format.util';
+import { useInventoryProducts } from '@/src/hooks/ProduitsStock/useInventoryProducts';
+import { useInventoryCatalog } from '@/src/hooks/ProduitsStock/useInventoryCatalog';
+import { ProductDetailDrawer } from '@/src/features/inventory/components/ProductDetailDrawer';
 
 function TrendBadge({ value }: { value: number | null }) {
   if (value === null) {
@@ -308,7 +308,7 @@ export function InventoryView() {
                         >
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2.5">
-                              <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#F0FAF6] border border-emerald-100 flex-shrink-0">
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center bg-[#F0FAF6] border border-emerald-100 flex-shrink-0">
                                 <Pill size={12} className="text-[#0B8F68]" />
                               </div>
                               <div>

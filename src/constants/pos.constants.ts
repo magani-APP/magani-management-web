@@ -1,6 +1,6 @@
 import { Wallet, Smartphone, Phone, CreditCard, Layers } from 'lucide-react';
-import { TOKENS } from '../constants/design-tokens.constants';
-import { PaymentMethod } from '../types/pos.types';
+import { TOKENS } from '@/src/constants/design-tokens.constants';
+import { PaymentMethod } from '@/src/types/pos.types';
 
 export const CATEGORIES = [
   'Tous',

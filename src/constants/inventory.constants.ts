@@ -1,5 +1,5 @@
-import { TOKENS } from '../../../constants/design-tokens.constants';
-import { InventoryFilterLabel, StockStatus } from '../types/inventory.types';
+import { TOKENS } from '@/src/constants/design-tokens.constants';
+import { InventoryFilterLabel, StockStatus } from '@/src/types/inventory.types';
 import { MovementType } from '../types/inventory.types';
 
 export const INVENTORY_FILTERS: InventoryFilterLabel[] = [

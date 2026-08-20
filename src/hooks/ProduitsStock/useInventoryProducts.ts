@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getInventoryProducts, getInventoryStats } from '../../../api/inventory.api';
-import { InventoryProduct, InventoryStats } from '../types/inventory.types';
+import { getInventoryProducts, getInventoryStats } from '../../api/inventory.api';
+import { InventoryProduct, InventoryStats } from '../../types/inventory.types';
 
 export function useInventoryProducts() {
   const [products, setProducts] = useState<InventoryProduct[]>([]);
