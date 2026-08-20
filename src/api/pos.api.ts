@@ -1,5 +1,5 @@
 import { mockPosProducts } from '../mocks/pos.mock';
-import { Product } from '../features/pos/types/pos.types';
+import { Product } from '../types/pos.types';
 
 export type { Product };
 

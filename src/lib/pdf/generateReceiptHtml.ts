@@ -1,5 +1,5 @@
-import { CompletedOrder } from '../../features/pos/types/pos.types';
-import { formatPrice } from '../../features/pos/utils/formatPrice.util';
+import { CompletedOrder } from '../../types/pos.types';
+import { formatPrice } from '../../utils/formatPrice.util';
 
 export const generateReceiptHtml = (completedOrderDetails: CompletedOrder): string => {
   const formattedDate = new Intl.DateTimeFormat('fr-FR', {

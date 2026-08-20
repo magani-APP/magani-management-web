@@ -17,11 +17,11 @@ import {
   Download,
 } from 'lucide-react';
 import { TOKENS } from '../../../constants/design-tokens.constants';
-import { CATEGORIES, PAYMENT_METHODS } from '../constants/pos.constants';
-import { formatPrice } from '../utils/formatPrice.util';
-import { useProducts } from '../hooks/useProducts';
-import { usePosCatalog } from '../hooks/usePosCatalog';
-import { usePosCart } from '../hooks/usePosCart';
+import { CATEGORIES, PAYMENT_METHODS } from '../../../constants/pos.constants';
+import { formatPrice } from '../../../utils/formatPrice.util';
+import { useProducts } from '../../../hooks/CaissePOS/useProducts';
+import { usePosCatalog } from '../../../hooks/CaissePOS/usePosCatalog';
+import { usePosCart } from '../../../hooks/CaissePOS/usePosCart';
 
 export function PosView() {
   const { products } = useProducts();
@@ -311,70 +311,64 @@ export function PosView() {
             </div>
 
             <div className="flex items-center gap-1.5 min-w-0">
-              {/* Liste des attentes — scroll horizontal quand ça déborde */}
-              <div className="relative min-w-0 max-w-[160px] sm:max-w-[200px]">
-                {/* Fondu gauche : indique qu'on peut scroller vers la gauche */}
-                {canScrollLeft && (
-                  <div
-                    className="pointer-events-none absolute left-0 top-0 bottom-1.5 w-4 z-10"
-                    style={{
-                      background: 'linear-gradient(to right, white, transparent)',
-                    }}
-                  />
-                )}
-                {/* Fondu droit : indique qu'il y a d'autres attentes à droite */}
-                {canScrollRight && (
-                  <div
-                    className="pointer-events-none absolute right-0 top-0 bottom-1.5 w-4 z-10"
-                    style={{
-                      background: 'linear-gradient(to left, white, transparent)',
-                    }}
-                  />
-                )}
-
-                <div
-                  ref={heldSalesScrollRef}
-                  className="held-sales-scroll flex items-center gap-1.5 overflow-x-auto pb-1.5 [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-track]:bg-[#E8EDEA] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-amber-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-amber-500"
-                  style={{
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: `${TOKENS.warning} #E8EDEA`,
-                  }}
-                >
-                  {heldSales.map((hold) => (
+              {/* Liste des attentes — scroll horizontal quand ça déborde.
+                  N'apparaît que s'il existe réellement des ventes en attente
+                  (plus de placeholders "Attente #1" / "Attente #2" statiques). */}
+              {heldSales.length > 0 && (
+                <div className="relative min-w-0 max-w-[160px] sm:max-w-[200px]">
+                  {/* Fondu gauche : indique qu'on peut scroller vers la gauche */}
+                  {canScrollLeft && (
                     <div
-                      key={hold.id}
-                      className="group flex-shrink-0 flex items-center gap-1 pl-2 pr-1 py-1 rounded-lg bg-amber-50 border border-amber-100 hover:bg-amber-100 transition-colors"
-                    >
-                      <button
-                        onClick={() => handleRestoreHoldSale(hold.id)}
-                        className="text-amber-700 text-[9px] font-bold whitespace-nowrap"
-                      >
-                        {hold.label}
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteHoldSale(hold.id);
-                        }}
-                        aria-label={`Supprimer ${hold.label}`}
-                        className="flex items-center justify-center w-3.5 h-3.5 rounded-full flex-shrink-0 text-amber-400 hover:bg-red-500 hover:text-white transition-colors"
-                      >
-                        <X className="w-2.5 h-2.5" strokeWidth={3} />
-                      </button>
-                    </div>
-                  ))}
-                  {heldSales.length === 0 && (
-                    <>
-                      <span className="flex-shrink-0 px-2 py-1 rounded-lg bg-amber-50 border border-amber-100 text-amber-700 text-[9px] font-bold opacity-70 cursor-not-allowed whitespace-nowrap">
-                        Attente #1
-                      </span>
-                      <span className="flex-shrink-0 px-2 py-1 rounded-lg bg-amber-50 border border-amber-100 text-amber-700 text-[9px] font-bold opacity-70 cursor-not-allowed whitespace-nowrap">
-                        Attente #2
-                      </span>
-                    </>
+                      className="pointer-events-none absolute left-0 top-0 bottom-1.5 w-4 z-10"
+                      style={{
+                        background: 'linear-gradient(to right, white, transparent)',
+                      }}
+                    />
                   )}
+                  {/* Fondu droit : indique qu'il y a d'autres attentes à droite */}
+                  {canScrollRight && (
+                    <div
+                      className="pointer-events-none absolute right-0 top-0 bottom-1.5 w-4 z-10"
+                      style={{
+                        background: 'linear-gradient(to left, white, transparent)',
+                      }}
+                    />
+                  )}
+
+                  <div
+                    ref={heldSalesScrollRef}
+                    className="held-sales-scroll flex items-center gap-1.5 overflow-x-auto pb-1.5 [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-track]:bg-[#E8EDEA] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-amber-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-amber-500"
+                    style={{
+                      scrollbarWidth: 'thin',
+                      scrollbarColor: `${TOKENS.warning} #E8EDEA`,
+                    }}
+                  >
+                    {heldSales.map((hold) => (
+                      <div
+                        key={hold.id}
+                        className="group flex-shrink-0 flex items-center gap-1 pl-2 pr-1 py-1 rounded-lg bg-amber-50 border border-amber-100 hover:bg-amber-100 transition-colors"
+                      >
+                        <button
+                          onClick={() => handleRestoreHoldSale(hold.id)}
+                          className="text-amber-700 text-[9px] font-bold whitespace-nowrap"
+                        >
+                          {hold.label}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteHoldSale(hold.id);
+                          }}
+                          aria-label={`Supprimer ${hold.label}`}
+                          className="flex items-center justify-center w-3.5 h-3.5 rounded-full flex-shrink-0 text-amber-400 hover:bg-red-500 hover:text-white transition-colors"
+                        >
+                          <X className="w-2.5 h-2.5" strokeWidth={3} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <button className="mobile-sheet-close flex-shrink-0" aria-label="Fermer le panier">
                 <X className="w-4 h-4" />

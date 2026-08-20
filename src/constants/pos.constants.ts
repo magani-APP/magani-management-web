@@ -1,5 +1,5 @@
 import { Wallet, Smartphone, Phone, CreditCard, Layers } from 'lucide-react';
-import { TOKENS } from '../../../constants/design-tokens.constants';
+import { TOKENS } from '../constants/design-tokens.constants';
 import { PaymentMethod } from '../types/pos.types';
 
 export const CATEGORIES = [

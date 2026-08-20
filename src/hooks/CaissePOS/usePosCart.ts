@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   CartItem,
   CompletedOrder,
   HeldSale,
   PaymentMethod,
   Product,
-} from '../types/pos.types';
-import { generateReceiptHtml } from '../../../lib/pdf/generateReceiptHtml';
-import { downloadHtmlFile } from '../../../lib/pdf/downloadHtmlFile';
+} from '../../types/pos.types';
+import { generateReceiptHtml } from '../../lib/pdf/generateReceiptHtml';
+import { downloadHtmlFile } from '../../lib/pdf/downloadHtmlFile';
 
 export function usePosCart(products: Product[]) {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -26,19 +26,6 @@ export function usePosCart(products: Product[]) {
     items: CartItem[];
     discount: number;
   } | null>(null);
-
-  // NOTE (adaptation obligatoire) : dans la version d'origine, le panier était
-  // initialisé de façon synchrone avec INITIAL_PRODUCTS[11]. Depuis que les
-  // produits transitent obligatoirement par la couche API/mock (MOCK_DATA_STRATEGY.md
-  // §2), ils ne sont plus disponibles de façon synchrone au montage. On reproduit
-  // donc le même état de démonstration dès que les produits arrivent, une seule fois.
-  const hasSeededDemoCart = useRef(false);
-  useEffect(() => {
-    if (!hasSeededDemoCart.current && products.length > 11) {
-      setCart([{ product: products[11], quantity: 1 }]);
-      hasSeededDemoCart.current = true;
-    }
-  }, [products]);
 
   // --- CALCULS PANIER ---
   const totalItemsCount = useMemo(() => {
@@ -104,7 +91,17 @@ export function usePosCart(products: Product[]) {
   // --- VENTES EN ATTENTE ---
   const handleHoldSale = () => {
     if (cart.length === 0) return;
-    const nextSlotNum = heldSales.length + 1;
+
+    // Le numéro de la nouvelle attente reprend le plus grand numéro déjà
+    // présent dans la file (et non le nombre d'éléments), afin de ne pas
+    // réutiliser un numéro déjà attribué après suppression d'une attente.
+    const nextSlotNum =
+      heldSales.reduce((max, h) => {
+        const match = h.label.match(/#(\d+)/);
+        const num = match ? parseInt(match[1], 10) : 0;
+        return Math.max(max, num);
+      }, 0) + 1;
+
     const newHold: HeldSale = {
       id: `hold-${Date.now()}`,
       label: `Attente #${nextSlotNum}`,
@@ -122,7 +119,8 @@ export function usePosCart(products: Product[]) {
 
     setCart(targetHold.items);
     setDiscountPercent(targetHold.discount);
-    setHeldSales((prev) => prev.filter((h) => h.id !== holdId));
+    // L'attente reste dans la file : elle n'est retirée que via
+    // handleDeleteHoldSale (bouton "X" dédié), pas au simple clic.
   };
 
   const handleDeleteHoldSale = (holdId: string) => {

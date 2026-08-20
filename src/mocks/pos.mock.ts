@@ -1,4 +1,4 @@
-import { Product } from '../features/pos/types/pos.types';
+import { Product } from '../types/pos.types';
 
 export const mockPosProducts: Product[] = [
   {
