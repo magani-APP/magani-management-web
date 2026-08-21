@@ -21,10 +21,6 @@ export function useReservations() {
       setError(null);
       const data = await reservationsApi.getReservations();
       setReservations(data);
-      // Select the first one by default if none selected and there are results
-      if (data.length > 0 && !selectedReservationId) {
-        setSelectedReservationId(data[0].id);
-      }
     } catch (err) {
       setError('Erreur lors du chargement des réservations');
     } finally {

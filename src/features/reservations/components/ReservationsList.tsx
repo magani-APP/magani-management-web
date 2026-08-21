@@ -46,13 +46,13 @@ export function ReservationsList({
       <div className="p-5 border-b border-border-card flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-[14px] font-bold text-gray-900">Réservations</h2>
-          <button className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0D7A5F] hover:bg-[#0B6851] text-white rounded-full text-[12px] font-semibold transition-all active:scale-95 shadow-sm">
+          <button className="flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-full text-[12px] font-semibold transition-all active:scale-95 shadow-sm">
             <Plus size={14} strokeWidth={2.5} />
             Nouvelle
           </button>
         </div>
 
-        {/* Filtres Pills en flex-wrap (2 lignes comme sur Figma) */}
+        {/* Filtres Pills */}
         <div className="flex flex-wrap items-center gap-1">
           {RESERVATION_FILTERS.map((filter) => {
             const count = counts[filter] || 0;
@@ -64,7 +64,7 @@ export function ReservationsList({
                 className={cn(
                   "flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium transition-all whitespace-nowrap",
                   isActive
-                    ? "bg-[#0B7B58] text-white font-semibold"
+                    ? "bg-brand-primary text-white font-semibold"
                     : "bg-[#F2F5F3] border border-[#E1E7E3] text-[#5A6862] hover:bg-[#E7ECE9]"
                 )}
               >
