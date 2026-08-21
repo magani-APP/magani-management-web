@@ -57,7 +57,7 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
           <HeartPulse size={15} />
         </div>
         <div>
-          <h1 className="text-text-primary text-[14px] font-bold leading-none mb-1 tracking-tight">Magali</h1>
+          <h1 className="text-text-primary text-[14px] font-bold leading-none mb-1 tracking-tight">Magani</h1>
           <p className="text-text-placeholder text-[10px] font-medium leading-none uppercase tracking-[0.05em] truncate">
             {pharmacy?.name || "Chargement..."}
           </p>

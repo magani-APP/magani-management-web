@@ -1,6 +1,6 @@
-import { Sidebar } from "../../components/layout/Sidebar";
-import { Topbar } from "../../components/layout/Topbar";
-import { getCurrentUser, getPharmacyInfo } from "../../api/core.api";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Topbar } from "@/components/layout/Topbar";
+import { getCurrentUser, getPharmacyInfo } from "@/api/core.api";
 
 export default async function DashboardLayout({
   children,
