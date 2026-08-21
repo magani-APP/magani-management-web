@@ -17,12 +17,12 @@ import {
   MoreHorizontal,
   Pill,
 } from 'lucide-react';
-import { TOKENS } from '@/src/constants/design-tokens.constants';
-import { INVENTORY_FILTERS, STATUS_CONFIG } from '@/src/constants/inventory.constants';
-import { formatPrice, formatDate, formatCompactCFA } from '@/src/utils/format.util';
-import { useInventoryProducts } from '@/src/hooks/ProduitsStock/useInventoryProducts';
-import { useInventoryCatalog } from '@/src/hooks/ProduitsStock/useInventoryCatalog';
-import { ProductDetailDrawer } from '@/src/features/inventory/components/ProductDetailDrawer';
+import { TOKENS } from '@/constants/design-tokens.constants';
+import { INVENTORY_FILTERS, STATUS_CONFIG } from '@/constants/inventory.constants';
+import { formatPrice, formatDate, formatCompactCFA } from '@/utils/format.util';
+import { useInventoryProducts } from '@/hooks/ProduitsStock/useInventoryProducts';
+import { useInventoryCatalog } from '@/hooks/ProduitsStock/useInventoryCatalog';
+import { ProductDetailDrawer } from '@/features/inventory/components/ProductDetailDrawer';
 
 function TrendBadge({ value }: { value: number | null }) {
   if (value === null) {
@@ -106,47 +106,47 @@ export function InventoryView() {
 
   const statCards = stats
     ? [
-        {
-          icon: Package2,
-          iconColor: 'rgb(11, 143, 104)',
-          iconBg: 'rgba(11, 143, 104, 0.08)',
-          value: new Intl.NumberFormat('fr-FR').format(stats.activeProducts),
-          label: 'Produits actifs',
-          trend: stats.activeProductsTrend,
-        },
-        {
-          icon: Wallet,
-          iconColor: 'rgb(7, 99, 75)',
-          iconBg: 'rgba(7, 99, 75, 0.08)',
-          value: `${formatCompactCFA(stats.stockValue)} FCFA`,
-          label: 'Valeur du stock',
-          trend: stats.stockValueTrend,
-        },
-        {
-          icon: TriangleAlert,
-          iconColor: 'rgb(239, 68, 68)',
-          iconBg: 'rgba(239, 68, 68, 0.08)',
-          value: String(stats.criticalStock),
-          label: 'Stock critique',
-          trend: stats.criticalStockTrend,
-        },
-        {
-          icon: Clock,
-          iconColor: 'rgb(249, 115, 22)',
-          iconBg: 'rgba(249, 115, 22, 0.08)',
-          value: String(stats.expiringSoon),
-          label: 'Expirent < 60j',
-          trend: stats.expiringSoonTrend,
-        },
-        {
-          icon: TrendingUp,
-          iconColor: 'rgb(59, 130, 246)',
-          iconBg: 'rgba(59, 130, 246, 0.08)',
-          value: `${String(stats.averageMargin).replace('.', ',')}%`,
-          label: 'Marge moyenne',
-          trend: stats.averageMarginTrend,
-        },
-      ]
+      {
+        icon: Package2,
+        iconColor: 'rgb(11, 143, 104)',
+        iconBg: 'rgba(11, 143, 104, 0.08)',
+        value: new Intl.NumberFormat('fr-FR').format(stats.activeProducts),
+        label: 'Produits actifs',
+        trend: stats.activeProductsTrend,
+      },
+      {
+        icon: Wallet,
+        iconColor: 'rgb(7, 99, 75)',
+        iconBg: 'rgba(7, 99, 75, 0.08)',
+        value: `${formatCompactCFA(stats.stockValue)} FCFA`,
+        label: 'Valeur du stock',
+        trend: stats.stockValueTrend,
+      },
+      {
+        icon: TriangleAlert,
+        iconColor: 'rgb(239, 68, 68)',
+        iconBg: 'rgba(239, 68, 68, 0.08)',
+        value: String(stats.criticalStock),
+        label: 'Stock critique',
+        trend: stats.criticalStockTrend,
+      },
+      {
+        icon: Clock,
+        iconColor: 'rgb(249, 115, 22)',
+        iconBg: 'rgba(249, 115, 22, 0.08)',
+        value: String(stats.expiringSoon),
+        label: 'Expirent < 60j',
+        trend: stats.expiringSoonTrend,
+      },
+      {
+        icon: TrendingUp,
+        iconColor: 'rgb(59, 130, 246)',
+        iconBg: 'rgba(59, 130, 246, 0.08)',
+        value: `${String(stats.averageMargin).replace('.', ',')}%`,
+        label: 'Marge moyenne',
+        trend: stats.averageMarginTrend,
+      },
+    ]
     : [];
 
   return (
@@ -223,9 +223,8 @@ export function InventoryView() {
                     key={filter}
                     type="button"
                     onClick={() => setActiveFilter(filter)}
-                    className={`px-2.5 py-1.5 rounded-2xl text-[10px] font-bold transition-colors ${
-                      isActive ? 'text-white' : 'text-[#9AAEA3] hover:text-[#0F1A15]'
-                    }`}
+                    className={`px-2.5 py-1.5 rounded-2xl text-[10px] font-bold transition-colors ${isActive ? 'text-white' : 'text-[#9AAEA3] hover:text-[#0F1A15]'
+                      }`}
                     style={isActive ? { background: 'rgb(11, 143, 104)' } : undefined}
                   >
                     {filter}
@@ -302,9 +301,8 @@ export function InventoryView() {
                         <tr
                           key={product.id}
                           onClick={() => toggleProductDetail(product.id)}
-                          className={`border-t border-[#F0F5F2] cursor-pointer transition-colors text-xs hover:bg-[#F9FBFA] ${zebra} ${
-                            isSelected ? 'bg-[#F0FAF6]' : ''
-                          }`}
+                          className={`border-t border-[#F0F5F2] cursor-pointer transition-colors text-xs hover:bg-[#F9FBFA] ${zebra} ${isSelected ? 'bg-[#F0FAF6]' : ''
+                            }`}
                         >
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2.5">

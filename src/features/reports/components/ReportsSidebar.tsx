@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { REPORT_TABS } from "@/constants/reports";
 import { ReportTabId } from "@/types/reports";
 import { Package2, TrendingUp, ChartNoAxesColumn, Archive, Download, FileSpreadsheet, TrendingDown, UserCheck, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { REPORT_TABS } from "@/constants/reports";
 
 const tabIcons: Record<ReportTabId, React.ReactNode> = {
   sales: <TrendingUp size={14} />,

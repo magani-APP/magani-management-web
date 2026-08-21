@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { X, Pen, Plus, Archive, Activity } from 'lucide-react';
-import { TOKENS } from '@/src/constants/design-tokens.constants';
-import { InventoryProduct } from '@/src/types/inventory.types';
-import { STATUS_CONFIG, MOVEMENT_LABELS } from '@/src/constants/inventory.constants';
-import { formatPrice, formatDate, formatShortDate } from '@/src/utils/format.util';
-import { ProductAvatar } from './ProductAvatar';
+import { TOKENS } from '@/constants/design-tokens.constants';
+import { InventoryProduct } from '@/types/inventory.types';
+import { STATUS_CONFIG, MOVEMENT_LABELS } from '@/constants/inventory.constants';
+import { formatPrice, formatDate, formatShortDate } from '@/utils/format.util';
+import { ProductAvatar } from '@/features/inventory/components/ProductAvatar';
 
 interface ProductDetailDrawerProps {
   product: InventoryProduct;
@@ -150,9 +150,8 @@ export function ProductDetailDrawer({ product, onClose, onEdit, onRestock }: Pro
                   className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-[#F5F7F5] transition-colors"
                 >
                   <span
-                    className={`text-[10px] font-bold font-mono w-8 text-right flex-shrink-0 ${
-                      isPositive ? 'text-emerald-600' : 'text-red-500'
-                    }`}
+                    className={`text-[10px] font-bold font-mono w-8 text-right flex-shrink-0 ${isPositive ? 'text-emerald-600' : 'text-red-500'
+                      }`}
                   >
                     {isPositive ? '+' : ''}
                     {movement.quantity}

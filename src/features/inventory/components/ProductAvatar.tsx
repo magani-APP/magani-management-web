@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Pill } from 'lucide-react';
-import { TOKENS } from '../../../constants/design-tokens.constants';
+import { TOKENS } from '@/constants/design-tokens.constants';
 
 interface ProductAvatarProps {
   name: string;

@@ -55,21 +55,21 @@ export function SalesReport({ data, timeFilter, onTimeFilterChange }: SalesRepor
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="p-5 rounded-2xl bg-surface-main border border-border-card hover:shadow-[0_8px_24px_rgba(11,143,104,0.05)] transition-all">
+        <div className="p-5 rounded-2xl bg-white/88 border border-border-card hover:shadow-[0_8px_24px_rgba(11,143,104,0.05)] transition-all">
           <div className="text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] mb-2">CA TOTAL</div>
-          <div className="text-[22px] font-bold text-brand-primary tracking-tight">{formatFCFA(data.totalRevenue)}</div>
+          <div className="text-[18px] font-bold text-brand-primary tracking-tight">{formatFCFA(data.totalRevenue)}</div>
         </div>
-        <div className="p-5 rounded-2xl bg-surface-main border border-border-card hover:shadow-[0_8px_24px_rgba(11,143,104,0.05)] transition-all">
+        <div className="p-5 rounded-2xl bg-white/88 border border-border-card hover:shadow-[0_8px_24px_rgba(11,143,104,0.05)] transition-all">
           <div className="text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] mb-2">TRANSACTIONS</div>
-          <div className="text-[22px] font-bold text-brand-primary tracking-tight">{data.totalTransactions}</div>
+          <div className="text-[18px] font-bold text-brand-primary tracking-tight">{data.totalTransactions}</div>
         </div>
-        <div className="p-5 rounded-2xl bg-surface-main border border-border-card hover:shadow-[0_8px_24px_rgba(11,143,104,0.05)] transition-all">
+        <div className="p-5 rounded-2xl bg-white/88 border border-border-card hover:shadow-[0_8px_24px_rgba(11,143,104,0.05)] transition-all">
           <div className="text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] mb-2">PANIER MOYEN</div>
-          <div className="text-[22px] font-bold text-brand-primary tracking-tight">{formatFCFA(data.averageBasket)}</div>
+          <div className="text-[18px] font-bold text-[#3B82F6] tracking-tight">{formatFCFA(data.averageBasket)}</div>
         </div>
       </div>
 
-      <div className="p-5 rounded-2xl bg-surface-main border border-border-card h-[320px] flex flex-col">
+      <div className="p-5 rounded-2xl bg-white/88 border border-border-card h-[320px] flex flex-col">
         <div className="text-[14px] font-bold text-text-foreground mb-4">CA quotidien (FCFA)</div>
         <div className="flex-1 min-h-0">
           <ResponsiveContainer width="100%" height="100%">
@@ -112,7 +112,7 @@ export function SalesReport({ data, timeFilter, onTimeFilterChange }: SalesRepor
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border-card bg-surface-main overflow-hidden">
+      <div className="rounded-2xl border border-border-card bg-white/88 overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface-alt border-b border-border-divider">

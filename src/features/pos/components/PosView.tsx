@@ -211,7 +211,7 @@ export function PosView() {
         </div>
 
         {/* GRILLE PRODUITS */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
           {filteredProducts.length === 0 ? (
             <div
               className="h-64 flex flex-col items-center justify-center"

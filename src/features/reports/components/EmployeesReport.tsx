@@ -10,15 +10,15 @@ const formatFCFA = (value: number) => {
 
 export function EmployeesReport({ data }: EmployeesReportProps) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="max-w-[710px] flex flex-col gap-6">
       <div>
-        <h2 className="text-[20px] font-bold text-text-foreground">Performances par employé</h2>
+        <h2 className="text-[16px] font-bold text-text-foreground">Performances par employé</h2>
         <p className="text-[12px] font-medium text-text-muted mt-1">
           Chiffre d&apos;affaires et statistiques par caissier · août 2026
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
+      <div className="rounded-2xl border border-border-card bg-surface-muted overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface-alt border-b border-border-divider">
@@ -31,13 +31,13 @@ export function EmployeesReport({ data }: EmployeesReportProps) {
           </thead>
           <tbody>
             {data.map((row) => (
-              <tr 
-                key={row.id} 
-                className="border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
+              <tr
+                key={row.id}
+                className="bg-white/88 border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
               >
                 <td className="py-4 px-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#F0F7F3] flex items-center justify-center border border-[rgba(11,143,104,0.1)] text-[10px] font-bold text-brand-primary">
+                    <div className="w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center border border-[rgba(11,143,104,0.1)] text-[10px] font-bold text-white">
                       {row.initials}
                     </div>
                     <div className="flex flex-col">
@@ -52,8 +52,8 @@ export function EmployeesReport({ data }: EmployeesReportProps) {
                 <td className="py-4 px-4">
                   <div className="flex items-center justify-end gap-3">
                     <div className="flex-1 h-1.5 bg-surface-alt rounded-full overflow-hidden border border-border-card max-w-[80px]">
-                      <div 
-                        className="h-full bg-brand-primary rounded-full" 
+                      <div
+                        className="h-full bg-brand-primary rounded-full"
                         style={{ width: `${row.revenueShare}%` }}
                       />
                     </div>

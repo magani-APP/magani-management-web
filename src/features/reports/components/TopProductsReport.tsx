@@ -14,16 +14,16 @@ export function TopProductsReport({ data }: TopProductsReportProps) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-[20px] font-bold text-text-foreground">Top produits vendus</h2>
+        <h2 className="text-[16px] font-bold text-text-foreground">Top produits vendus</h2>
         <p className="text-[12px] font-medium text-text-muted mt-1">
           Classement par chiffre d&apos;affaires · août 2026
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
+      <div className="max-w-[710px] rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-surface-alt border-b border-border-divider">
+            <tr className="bg-surface-muted border-b border-border-divider">
               <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] w-12 text-center">#</th>
               <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Produit</th>
               <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-center">Unités vendues</th>
@@ -33,9 +33,9 @@ export function TopProductsReport({ data }: TopProductsReportProps) {
           </thead>
           <tbody>
             {data.map((row) => (
-              <tr 
-                key={row.id} 
-                className="border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
+              <tr
+                key={row.id}
+                className="bg-white/88 border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
               >
                 <td className="py-4 px-4 text-[11px] font-bold text-text-hairline text-center">{row.rank}</td>
                 <td className="py-4 px-4 text-[11px] font-bold text-text-foreground">
@@ -48,7 +48,7 @@ export function TopProductsReport({ data }: TopProductsReportProps) {
                 </td>
                 <td className="py-4 px-4 text-[11px] font-medium text-text-foreground text-center">{row.unitsSold}</td>
                 <td className="py-4 px-4 text-[11px] font-bold text-text-foreground text-right">{formatFCFA(row.revenue)}</td>
-                <td className="py-4 px-4 flex justify-end">
+                <td className="py-4 px-4 flex justify-center">
                   <span className={cn(
                     "inline-flex items-center gap-1 text-[10px] font-bold",
                     row.trend >= 0 ? "text-brand-primary" : "text-status-danger"

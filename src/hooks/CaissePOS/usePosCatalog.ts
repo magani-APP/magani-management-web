@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import { InventoryFilterLabel, InventoryProduct } from '../../types/inventory.types';
+import { InventoryFilterLabel, InventoryProduct } from '@/types/inventory.types';
 
 const FILTER_TO_STATUS: Record<InventoryFilterLabel, InventoryProduct['status'] | null> = {
   Tous: null,
@@ -22,7 +22,7 @@ export function useInventoryCatalog(products: any[] = []) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<InventoryFilterLabel>('Tous');
   const [selectedCategory, setSelectedCategory] = useState('Tous');
-  
+
   // Référence pour le raccourci F2 / focus recherche
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 

@@ -14,15 +14,15 @@ import {
 export function useReports() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as ReportTabId | null;
-  
+
   const activeTab = tabParam || "sales";
   const [timeFilter, setTimeFilter] = useState<"7days" | "14days">("14days");
 
   // Simulate filtering the sales data based on timeFilter
-  const filteredSalesHistory = timeFilter === "7days" 
+  const filteredSalesHistory = timeFilter === "7days"
     ? mockSalesReport.history.slice(-7)
     : mockSalesReport.history;
-    
+
   const salesData = {
     ...mockSalesReport,
     history: filteredSalesHistory

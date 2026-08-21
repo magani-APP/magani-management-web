@@ -18,7 +18,7 @@ export default async function DashboardLayout({
 
       <main className="flex flex-col flex-1 ml-[240px] h-full overflow-hidden">
         <Topbar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto no-scrollbar">
           {children}
         </div>
       </main>
