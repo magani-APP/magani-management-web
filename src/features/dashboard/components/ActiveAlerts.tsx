@@ -48,7 +48,7 @@ export function ActiveAlerts({ data }: ActiveAlertsProps) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 flex-1 overflow-y-auto">
+      <div className="flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
         {data.map((alert) => {
           const styles = getAlertStyles(alert.severity);
           return (

@@ -24,4 +24,16 @@ export const TOKENS = {
   purple: '#8B5CF6',
   mtn: '#FFC107',
   orange: '#FF6200',
+
+  // Ajouts §Inventaire — badges de statut & barre de marge (Produits & Stock)
+  successBg: '#E3F9EE',
+  successBorder: '#BFEAD3',
+  successText: '#059669',
+  dangerBg: '#FEECEC',
+  dangerBorder: '#FBD1D1',
+  dangerText: '#DC2626',
+  neutralBg: '#F1F3F2',
+  neutralBorder: '#E2E7E4',
+  neutralText: '#5B6B61',
+  lime: '#84CC16',
 };

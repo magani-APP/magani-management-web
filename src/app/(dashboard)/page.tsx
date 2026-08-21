@@ -33,7 +33,7 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <div className="p-4 md:p-4 overflow-y-auto h-full">
+    <div className="p-4 md:p-4 overflow-y-auto no-scrollbar h-full">
       <DashboardHeader />
 
       <KpiGrid kpis={kpis as any} />

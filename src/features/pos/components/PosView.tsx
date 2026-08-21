@@ -19,8 +19,8 @@ import {
 import { TOKENS } from '../../../constants/design-tokens.constants';
 import { CATEGORIES, PAYMENT_METHODS } from '../../../constants/pos.constants';
 import { formatPrice } from '../../../utils/formatPrice.util';
-import { useProducts } from '../../../hooks/CaissePOS/useProducts';
-import { usePosCatalog } from '../../../hooks/CaissePOS/usePosCatalog';
+import { useProducts } from '../../../hooks/ProduitsStock/useProducts';
+import { useInventoryCatalog } from '../../../hooks/CaissePOS/usePosCatalog';
 import { usePosCart } from '../../../hooks/CaissePOS/usePosCart';
 
 export function PosView() {
@@ -33,7 +33,7 @@ export function PosView() {
     setSelectedCategory,
     filteredProducts,
     searchInputRef,
-  } = usePosCatalog(products);
+  } = useInventoryCatalog(products);
 
   const {
     cart,
@@ -162,8 +162,7 @@ export function PosView() {
         }
       `}</style>
 
-      {/* SECTION GAUCHE : CATÉGORIES, RECHERCHE & PRODUITS
-          -- Classes/structure alignées sur la configuration relevée dans l'inspecteur -- */}
+      {/* SECTION GAUCHE : CATÉGORIES, RECHERCHE & PRODUITS */}
       <div className="pos-catalog flex-1 flex flex-col min-w-0 overflow-hidden p-5 pr-3 gap-3">
         {/* RECHERCHE — Input POS (large) */}
         <div className="relative flex-shrink-0">
@@ -212,7 +211,7 @@ export function PosView() {
         </div>
 
         {/* GRILLE PRODUITS */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
           {filteredProducts.length === 0 ? (
             <div
               className="h-64 flex flex-col items-center justify-center"
@@ -292,12 +291,11 @@ export function PosView() {
         </div>
       </div>
 
-      {/* SECTION DROITE : PANIER — w-[340px] fixe, cf. §10 */}
+      {/* SECTION DROITE : PANIER */}
       <div className="pos-cart w-[340px] flex-shrink-0 flex flex-col bg-white border-l border-[#E8EDEA] overflow-hidden">
         {/* EN-TÊTE PANIER */}
         <div className="px-5 pt-4 pb-3 border-b border-[#F0F5F2] flex-shrink-0">
           <div className="flex items-center justify-between gap-2 min-w-0">
-            {/* "Nouvelle vente" — ne bouge jamais, largeur fixe non compressible */}
             <div className="flex items-center gap-2 flex-shrink-0">
               <h2 className="text-sm font-bold text-[#0F1A15]">Nouvelle vente</h2>
               {totalItemsCount > 0 && (
@@ -311,12 +309,8 @@ export function PosView() {
             </div>
 
             <div className="flex items-center gap-1.5 min-w-0">
-              {/* Liste des attentes — scroll horizontal quand ça déborde.
-                  N'apparaît que s'il existe réellement des ventes en attente
-                  (plus de placeholders "Attente #1" / "Attente #2" statiques). */}
               {heldSales.length > 0 && (
                 <div className="relative min-w-0 max-w-[160px] sm:max-w-[200px]">
-                  {/* Fondu gauche : indique qu'on peut scroller vers la gauche */}
                   {canScrollLeft && (
                     <div
                       className="pointer-events-none absolute left-0 top-0 bottom-1.5 w-4 z-10"
@@ -325,7 +319,6 @@ export function PosView() {
                       }}
                     />
                   )}
-                  {/* Fondu droit : indique qu'il y a d'autres attentes à droite */}
                   {canScrollRight && (
                     <div
                       className="pointer-events-none absolute right-0 top-0 bottom-1.5 w-4 z-10"
@@ -547,7 +540,7 @@ export function PosView() {
             </div>
           </div>
 
-          {/* BOUTON ENCAISSER — CTA principal POS, cf. §8 */}
+          {/* BOUTON ENCAISSER */}
           <div className="px-4 pb-4">
             <button
               disabled={cart.length === 0}
