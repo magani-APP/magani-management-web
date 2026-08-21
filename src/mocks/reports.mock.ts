@@ -82,9 +82,10 @@ export const mockEmployees: EmployeePerformance[] = [
 export const mockPayments: PaymentsData = {
   totalAmount: 2172000,
   modes: [
-    { id: "pm1", mode: "Espèces", transactions: 245, amount: 1194600, share: 55, color: "#0B8F68" },
-    { id: "pm2", mode: "Orange Money", transactions: 98, amount: 543000, share: 25, color: "#FF6200" },
+    { id: "pm1", mode: "Espèces", transactions: 245, amount: 1194600, share: 50, color: "#0B8F68" },
+    { id: "pm2", mode: "Orange Money", transactions: 98, amount: 543000, share: 20, color: "#FF6200" },
     { id: "pm3", mode: "MTN Mobile Money", transactions: 64, amount: 325800, share: 15, color: "#FFC107" },
     { id: "pm4", mode: "Carte Bancaire", transactions: 22, amount: 108600, share: 5, color: "#3B82F6" },
+    { id: "pm5", mode: "Mixte", transactions: 34, amount: 171000, share: 10, color: "#8B5CF6" },
   ]
 };

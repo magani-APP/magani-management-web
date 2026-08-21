@@ -13,16 +13,19 @@ const formatFCFA = (value: number) => {
 
 export function PaymentsReport({ data }: PaymentsReportProps) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
+      {/* En-tête */}
       <div>
-        <h2 className="text-[20px] font-bold text-text-foreground">Rapport des paiements</h2>
-        <p className="text-[12px] font-medium text-text-muted mt-1">
-          Répartition par mode de règlement · août 2026
+        <h2 className="text-[18px] font-bold text-text-foreground">Rapport des paiements</h2>
+        <p className="text-[11px] font-medium text-text-muted mt-0.5">
+          Modes de règlement - août 2026
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white/88 rounded-2xl border border-border-card bg-surface-main p-6 shadow-sm flex flex-col items-center justify-center min-h-[350px]">
+      {/* Grille principale */}
+      <div className="grid grid-cols-1 lg:grid-cols-[290px_1fr] gap-4 items-stretch">
+        {/* Carte Graphique Donut */}
+        <div className="bg-white rounded-2xl border border-border-card p-4 shadow-sm flex items-center justify-center min-h-[280px]">
           <div className="w-full h-[220px] relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -30,9 +33,9 @@ export function PaymentsReport({ data }: PaymentsReportProps) {
                   data={data.modes}
                   cx="50%"
                   cy="50%"
-                  innerRadius={75}
-                  outerRadius={100}
-                  paddingAngle={2}
+                  innerRadius={62}
+                  outerRadius={88}
+                  paddingAngle={3}
                   dataKey="amount"
                   stroke="none"
                 >
@@ -41,52 +44,78 @@ export function PaymentsReport({ data }: PaymentsReportProps) {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
-                  itemStyle={{ fontSize: '12px', fontWeight: 700 }}
-                  labelStyle={{ display: 'none' }}
-                  formatter={(value: string | number | readonly (string | number)[] | undefined, name: string | number | undefined, props: { payload?: { fill?: string } }) => [
-                    formatFCFA(Number(value || 0)),
-                    <span key={String(name)} style={{ color: props?.payload?.fill }}>{name}</span>
-                  ]}
+                  contentStyle={{
+                    borderRadius: "12px",
+                    border: "none",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                  }}
+                  itemStyle={{ fontSize: "12px", fontWeight: 700 }}
+                  labelStyle={{ display: "none" }}
+                  formatter={(
+                    value: string | number | readonly (string | number)[] | undefined,
+                    name: string | number | undefined,
+                    props: { payload?: { fill?: string } }
+                  ) => [
+                      formatFCFA(Number(value || 0)),
+                      <span key={String(name)} style={{ color: props?.payload?.fill }}>
+                        {name}
+                      </span>,
+                    ]}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm flex flex-col">
-          <div className="p-5 border-b border-border-divider">
-            <h3 className="text-[14px] font-bold text-text-foreground">Détails par mode</h3>
-          </div>
-          <div className="flex-1 overflow-x-auto no-scrollbar">
-            <table className="w-full text-left border-collapse min-w-[300px]">
+        {/* Carte Tableau des détails */}
+        <div className="bg-white rounded-2xl border border-border-card shadow-sm overflow-hidden flex flex-col justify-between">
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left border-collapse min-w-[320px]">
               <thead>
-                <tr className="bg-surface-alt border-b border-border-divider">
-                  <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Mode</th>
-                  <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-center">Transactions</th>
-                  <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">Montant</th>
-                  <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">Part</th>
+                <tr className="border-b border-border-divider bg-surface-muted">
+                  <th className="py-3 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">
+                    Mode
+                  </th>
+                  <th className="py-3 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-center">
+                    Transactions
+                  </th>
+                  <th className="py-3 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">
+                    Montant
+                  </th>
+                  <th className="py-3 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">
+                    Part
+                  </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border-divider">
                 {data.modes.map((row) => (
                   <tr
                     key={row.id}
-                    className="border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
+                    className="hover:bg-surface-alt/50 transition-colors"
                   >
-                    <td className="py-4 px-4 text-[11px] font-bold text-text-foreground">
-                      <div className="flex items-center gap-2">
+                    <td className="py-3.5 px-5 text-[11px] font-bold text-text-foreground">
+                      <div className="flex items-center gap-2.5">
                         <div
-                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          className="w-2 h-2 rounded-full flex-shrink-0"
                           style={{ backgroundColor: row.color }}
                         />
                         {row.mode}
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-[11px] font-medium text-text-foreground text-center">{row.transactions}</td>
-                    <td className="py-4 px-4 text-[11px] font-bold text-text-foreground text-right">{formatFCFA(row.amount)}</td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-4xl bg-surface-alt border border-border-card text-[10px] font-bold text-text-muted">
+                    <td className="py-3.5 px-5 text-[11px] font-medium text-text-muted text-center">
+                      {row.transactions}
+                    </td>
+                    <td className="py-3.5 px-5 text-[11px] font-bold text-text-foreground text-right">
+                      {formatFCFA(row.amount)}
+                    </td>
+                    <td className="py-3.5 px-5 text-right">
+                      <span
+                        className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                        style={{
+                          backgroundColor: `${row.color}15`,
+                          color: row.color,
+                        }}
+                      >
                         {row.share}%
                       </span>
                     </td>
