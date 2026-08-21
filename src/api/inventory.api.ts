@@ -1,5 +1,5 @@
 import { mockInventoryProducts, mockInventoryStats } from '../mocks/inventory.mock';
-import { InventoryProduct, InventoryStats } from '../features/inventory/types/inventory.types';
+import { InventoryProduct, InventoryStats } from '@/types/inventory.types';
 
 export type { InventoryProduct, InventoryStats };
 
