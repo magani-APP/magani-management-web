@@ -11,7 +11,7 @@ export function SettingsLayout({ children, activeTab }: SettingsLayoutProps) {
   return (
     <div className="flex h-full">
       <SettingsSidebar activeTab={activeTab} />
-      <div className="flex-1 min-w-0 overflow-y-auto py-6 pr-8 no-scrollbar">
+      <div className="flex-1 overflow-y-auto p-8" style={{ scrollbarWidth: "none" }}>
         {children}
       </div>
     </div>

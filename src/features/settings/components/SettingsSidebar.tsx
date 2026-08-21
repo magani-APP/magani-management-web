@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Building2,
   Users,
   Receipt,
   CreditCard,
-  Package,
+  Package2,
   Bell,
   Printer,
   Zap,
@@ -18,16 +18,16 @@ import { SETTINGS_TABS } from "@/constants/settings.constants";
 import { SettingsTabId } from "@/types/settings";
 
 const TAB_ICONS: Record<SettingsTabId, React.ReactNode> = {
-  pharmacy: <Building2 size={14} />,
-  team: <Users size={14} />,
-  pos: <Receipt size={14} />,
-  payments: <CreditCard size={14} />,
-  stock: <Package size={14} />,
-  notifications: <Bell size={14} />,
-  receipts: <Printer size={14} />,
-  integrations: <Zap size={14} />,
-  "public-app": <Globe size={14} />,
-  security: <Shield size={14} />,
+  pharmacy: <Building2 size={13} />,
+  team: <Users size={13} />,
+  pos: <Receipt size={13} />,
+  payments: <CreditCard size={13} />,
+  stock: <Package2 size={13} />,
+  notifications: <Bell size={13} />,
+  receipts: <Printer size={13} />,
+  integrations: <Zap size={13} />,
+  "public-app": <Globe size={13} />,
+  security: <Shield size={13} />,
 };
 
 interface SettingsSidebarProps {
@@ -35,32 +35,41 @@ interface SettingsSidebarProps {
 }
 
 export function SettingsSidebar({ activeTab }: SettingsSidebarProps) {
-  return (
-    <div className="w-[200px] shrink-0 flex flex-col py-6 pr-4">
-      <h3 className="text-[9px] font-bold text-text-hairline uppercase tracking-[0.08em] mb-3 px-3">
-        Configuration
-      </h3>
+  const router = useRouter();
 
-      <nav className="flex flex-col gap-1">
+  return (
+    <div
+      className="settings-nav w-[218px] flex-shrink-0 flex flex-col border-r border-[#E8EDEA] bg-white overflow-y-auto"
+      style={{ scrollbarWidth: "none" }}
+    >
+      <div className="px-4 pt-5 pb-2">
+        <span className="text-[9px] font-bold text-[#C8D5CC] uppercase tracking-[0.08em]">
+          Configuration
+        </span>
+      </div>
+
+      <nav className="px-2 pb-4 space-y-0.5">
         {SETTINGS_TABS.map((tab) => {
           const isActive = tab.id === activeTab;
 
           return (
-            <Link
+            <button
               key={tab.id}
-              href={`/settings?tab=${tab.id}`}
+              type="button"
+              onClick={() => router.push(`/settings?tab=${tab.id}`, { scroll: false })}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-4xl text-[13px] font-semibold transition-all duration-150",
+                "w-full flex items-center gap-2.5 px-3 py-2.5 rounded-3xl text-xs font-medium transition-all text-left",
                 isActive
-                  ? "bg-brand-primary text-white shadow-button"
-                  : "text-text-secondary hover:bg-surface-muted hover:text-brand-primary"
+                  ? "text-white"
+                  : "text-[#4A5E54] hover:bg-[#F5F7F5] hover:text-[#0F1A15]"
               )}
+              style={isActive ? { background: "rgb(11, 143, 104)" } : undefined}
             >
-              <span className={cn("shrink-0", isActive ? "text-white" : "text-text-muted")}>
+              <span className={isActive ? "text-white" : "text-[#9AAEA3]"}>
                 {TAB_ICONS[tab.id]}
               </span>
               {tab.label}
-            </Link>
+            </button>
           );
         })}
       </nav>

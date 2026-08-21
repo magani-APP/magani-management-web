@@ -1,4 +1,4 @@
-import { SettingsTabId } from "../types/settings";
+import { SettingsTabId } from "@/types/settings";
 
 export const SETTINGS_TABS: { id: SettingsTabId; label: string }[] = [
   { id: "pharmacy", label: "Pharmacie" },
@@ -14,7 +14,7 @@ export const SETTINGS_TABS: { id: SettingsTabId; label: string }[] = [
 ];
 
 /** Champs affichés dans la carte "Informations de la pharmacie" (dans l'ordre). */
-export const PHARMACY_FIELDS: { key: keyof import("../types/settings").PharmacySettings; label: string }[] = [
+export const PHARMACY_FIELDS: { key: keyof import("@/types/settings").PharmacySettings; label: string }[] = [
   { key: "name", label: "Nom" },
   { key: "licenseNumber", label: "N° agrément" },
   { key: "address", label: "Adresse" },
@@ -22,3 +22,13 @@ export const PHARMACY_FIELDS: { key: keyof import("../types/settings").PharmacyS
   { key: "email", label: "Email" },
   { key: "hours", label: "Horaires" },
 ];
+
+/** Rôles proposés lors de l'invitation d'un nouveau membre. */
+export const TEAM_ROLE_OPTIONS: string[] = [
+  "Pharmacien(ne)",
+  "Caissier(ère)",
+  "Gestionnaire stock",
+];
+
+/** Rôle qui ne peut ni être désactivé ni retiré de l'équipe depuis cette page. */
+export const PROTECTED_TEAM_ROLE = "Propriétaire";
