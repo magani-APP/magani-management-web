@@ -10,6 +10,7 @@ import {
   ClipboardList,
   CalendarCheck,
   Settings,
+  Bot,
   Info,
   ChevronDown,
   HeartPulse,
@@ -101,6 +102,17 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
         <div className="border-t border-border-main mx-4 mb-2"></div>
 
         <div className="p-3 pt-0">
+          <Link
+            href="/help"
+            className={`flex items-center gap-3 px-3 py-2 mb-1 rounded-xl text-xs font-medium transition-colors ${
+              pathname === "/help"
+                ? "bg-brand-primary text-white shadow-button"
+                : "text-text-secondary hover:bg-surface-muted hover:text-brand-primary"
+            }`}
+          >
+            <Bot size={16} />
+            Maga — officine
+          </Link>
           <Link
             href="/help"
             className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl text-xs font-medium text-text-secondary hover:bg-surface-muted hover:text-brand-primary transition-colors"
