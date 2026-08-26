@@ -76,6 +76,34 @@ export function PosView() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showCheckoutSuccess, handleCancelCheckout, searchInputRef]);
 
+  // --- BLOCAGE DU SCROLL DE LA PAGE (html/body) ---
+  // On verrouille le scroll global le temps que ce composant soit monté,
+  // sans toucher aux zones internes qui ont leur propre overflow-y-auto.
+  useEffect(() => {
+    const htmlEl = document.documentElement;
+    const bodyEl = document.body;
+
+    const prevHtmlOverflow = htmlEl.style.overflow;
+    const prevBodyOverflow = bodyEl.style.overflow;
+    const prevHtmlHeight = htmlEl.style.height;
+    const prevBodyHeight = bodyEl.style.height;
+    const prevBodyOverscroll = bodyEl.style.overscrollBehavior;
+
+    htmlEl.style.overflow = 'hidden';
+    bodyEl.style.overflow = 'hidden';
+    htmlEl.style.height = '100%';
+    bodyEl.style.height = '100%';
+    bodyEl.style.overscrollBehavior = 'none';
+
+    return () => {
+      htmlEl.style.overflow = prevHtmlOverflow;
+      bodyEl.style.overflow = prevBodyOverflow;
+      htmlEl.style.height = prevHtmlHeight;
+      bodyEl.style.height = prevBodyHeight;
+      bodyEl.style.overscrollBehavior = prevBodyOverscroll;
+    };
+  }, []);
+
   // --- VENTES EN ATTENTE : molette verticale -> scroll horizontal ---
   const heldSalesScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -111,29 +139,28 @@ export function PosView() {
 
   return (
     <div
-      className="flex h-screen w-full text-[#0F1A15] overflow-hidden"
+      className="flex w-full text-[#0F1A15] overflow-hidden min-h-0"
       style={{
+        height: '100dvh',
         backgroundColor: TOKENS.bg,
         fontFamily:
           "'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
         WebkitFontSmoothing: 'antialiased',
         MozOsxFontSmoothing: 'grayscale',
+        overscrollBehavior: 'none',
       }}
     >
       {/* Police Geist / Geist Mono + utilitaire numérique tabulaire */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap');
 
-        /* Reset global : supprime la marge par défaut du navigateur
-           (souvent 8px sur <body>) qui laissait apparaître le fond de
-           page autour du panier blanc. */
-        html, body, #__next, #root {
-          margin: 0;
-          padding: 0;
-          width: 100%;
+        * { box-sizing: border-box; }
+
+        html, body {
+          overflow: hidden;
+          overscroll-behavior: none;
           height: 100%;
         }
-        * { box-sizing: border-box; }
 
         .font-tabular { font-family: 'Geist Mono', ui-monospace, monospace; font-feature-settings: "tnum" 1; }
         .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
@@ -189,7 +216,7 @@ export function PosView() {
         {/* CATÉGORIES */}
         <div
           className="flex gap-1.5 overflow-x-auto pb-0.5 flex-shrink-0"
-          style={{ scrollbarWidth: 'none' }}
+          style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
         >
           {CATEGORIES.map((category) => {
             const isActive = selectedCategory === category;
@@ -211,7 +238,10 @@ export function PosView() {
         </div>
 
         {/* GRILLE PRODUITS */}
-        <div className="flex-1 overflow-y-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
+        <div
+          className="flex-1 overflow-y-auto no-scrollbar min-h-0"
+          style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
+        >
           {filteredProducts.length === 0 ? (
             <div
               className="h-64 flex flex-col items-center justify-center"
@@ -223,7 +253,7 @@ export function PosView() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-3 pb-4">
+            <div className="grid grid-cols-3 gap-3 pb-12">
               {filteredProducts.map((product) => {
                 const cartItem = cart.find((i) => i.product.id === product.id);
                 const quantityInCart = cartItem ? cartItem.quantity : 0;
@@ -251,7 +281,7 @@ export function PosView() {
                     )}
 
                     <div
-                      className="w-9 h-9 rounded-xl mb-3 flex items-center justify-center"
+                      className="w-9 h-9 rounded-full mb-3 flex items-center justify-center"
                       style={
                         product.iconVariant === 'amber' || isLowStock
                           ? { backgroundColor: 'rgba(245,158,11,0.08)', color: TOKENS.warning }
@@ -292,8 +322,8 @@ export function PosView() {
       </div>
 
       {/* SECTION DROITE : PANIER */}
-      <div className="pos-cart w-[340px] flex-shrink-0 flex flex-col bg-white border-l border-[#E8EDEA] overflow-hidden">
-        {/* EN-TÊTE PANIER */}
+      <div className="pos-cart w-[340px] flex-shrink-0 flex flex-col bg-white border-l border-[#E8EDEA] overflow-hidden min-h-0">
+        {/* EN-TÊTE PANIER — toujours visible et statique (non scrollable) */}
         <div className="px-5 pt-4 pb-3 border-b border-[#F0F5F2] flex-shrink-0">
           <div className="flex items-center justify-between gap-2 min-w-0">
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -334,6 +364,7 @@ export function PosView() {
                     style={{
                       scrollbarWidth: 'thin',
                       scrollbarColor: `${TOKENS.warning} #E8EDEA`,
+                      overscrollBehavior: 'contain',
                     }}
                   >
                     {heldSales.map((hold) => (
@@ -371,7 +402,10 @@ export function PosView() {
         </div>
 
         {/* ARTICLES DU PANIER */}
-        <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-3 space-y-1.5">
+        <div
+          className="flex-1 overflow-y-auto no-scrollbar min-h-0 px-4 py-3 space-y-1.5"
+          style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
+        >
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6">
               <div
@@ -445,8 +479,9 @@ export function PosView() {
         </div>
 
         {/* BAS DU PANIER */}
-        <div className="flex-shrink-0 border-t border-[#F0F5F2]">
-          {/* REMISE + TOTAUX */}
+        <div className="flex-shrink-0 border-t border-[#F0F5F2] pb-14">
+          {/* REMISE + TOTAUX — masqué tant que le panier est vide */}
+          {cart.length > 0 && (
           <div className="px-4 pt-3 space-y-3">
             <div className="flex items-center gap-2">
               <Tag className="w-[11px] h-[11px] text-[#9AAEA3]" />
@@ -509,6 +544,7 @@ export function PosView() {
               </div>
             </div>
           </div>
+          )}
 
           {/* MODE DE PAIEMENT */}
           <div className="px-4 pt-2 pb-2">
@@ -521,7 +557,7 @@ export function PosView() {
                   <button
                     key={method.id}
                     onClick={() => setPaymentMethod(method.id)}
-                    className={`flex flex-col items-center gap-1 py-2 rounded-xl border text-[8px] font-bold transition-all ${
+                    className={`flex flex-col items-center gap-1 py-2 rounded-2xl border text-[8px] font-bold transition-all ${
                       isSelected
                         ? 'text-white border-transparent'
                         : 'bg-[#F5F7F5] text-[#9AAEA3] border-[#E8EDEA] hover:border-[#0B8F68]/30'
@@ -551,7 +587,7 @@ export function PosView() {
                 boxShadow: '0 4px 20px rgba(11,143,104,0.40)',
               }}
             >
-              Encaisser · {formatPrice(finalTotal)} FCFA
+              {cart.length > 0 ? `Encaisser · ${formatPrice(finalTotal)} FCFA` : 'Encaisser'}
             </button>
 
             <div className="flex gap-3 justify-center mt-2.5">
