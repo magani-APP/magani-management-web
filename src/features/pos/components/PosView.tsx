@@ -253,7 +253,7 @@ export function PosView() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-3 pb-4">
+            <div className="grid grid-cols-3 gap-3 pb-12">
               {filteredProducts.map((product) => {
                 const cartItem = cart.find((i) => i.product.id === product.id);
                 const quantityInCart = cartItem ? cartItem.quantity : 0;
