@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MoreHorizontal, Power, Trash2, UserCog } from "lucide-react";
 import { TeamMember } from "@/types/settings";
 import { PROTECTED_TEAM_ROLE } from "@/constants/settings.constants";
@@ -9,6 +9,7 @@ import { StatusBadge } from "./StatusBadge";
 interface TeamMemberRowProps {
   member: TeamMember;
   isLast: boolean;
+  isSecondToLast: boolean;
   onToggleStatus: (id: string) => void;
   onRemove: (id: string) => void;
 }
@@ -26,8 +27,16 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-export function TeamMemberRow({ member, onToggleStatus, onRemove }: TeamMemberRowProps) {
+export function TeamMemberRow({
+  member,
+  isLast,
+  isSecondToLast,
+  onToggleStatus,
+  onRemove,
+}: TeamMemberRowProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
+  const rowRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isActive = member.status === "active";
@@ -46,8 +55,30 @@ export function TeamMemberRow({ member, onToggleStatus, onRemove }: TeamMemberRo
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
 
+  // Détecte la position réelle de la ligne parmi ses frères dans le DOM,
+  // indépendamment de ce que transmet (ou non) le composant parent.
+  // Les 2 dernières lignes de la liste ouvrent leur menu vers le haut.
+  useLayoutEffect(() => {
+    if (!menuOpen || !rowRef.current || !rowRef.current.parentElement) {
+      return;
+    }
+
+    const parent = rowRef.current.parentElement;
+    const siblings = Array.from(parent.children);
+    const index = siblings.indexOf(rowRef.current);
+    const total = siblings.length;
+
+    const isLastLocal = index === total - 1;
+    const isSecondToLastLocal = index === total - 2;
+
+    setOpenUpward(isLast || isSecondToLast || isLastLocal || isSecondToLastLocal);
+  }, [menuOpen, isLast, isSecondToLast]);
+
   return (
-    <div className="flex items-center gap-4 px-5 py-4 hover:bg-[#F9FBFA] transition-colors">
+    <div
+      ref={rowRef}
+      className="flex items-center gap-4 px-5 py-4 hover:bg-[#F9FBFA] transition-colors"
+    >
       {/* Avatar */}
       <div
         className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
@@ -67,7 +98,7 @@ export function TeamMemberRow({ member, onToggleStatus, onRemove }: TeamMemberRo
       </div>
 
       {/* Rôle */}
-      <span className="text-[10px] font-semibold text-[#6B7A6F] bg-[#F5F7F5] px-2.5 py-1 rounded-lg border border-[#E8EDEA]">
+      <span className="text-[10px] font-semibold text-[#6B7A6F] bg-[#F5F7F5] px-2.5 py-1 rounded-2xl border border-[#E8EDEA]">
         {member.role}
       </span>
 
@@ -87,7 +118,11 @@ export function TeamMemberRow({ member, onToggleStatus, onRemove }: TeamMemberRo
         </button>
 
         {menuOpen && (
-          <div className="absolute right-0 top-6 z-10 w-56 rounded-xl border border-[#E8EDEA] bg-white shadow-lg py-1">
+          <div
+            className={`absolute right-0 z-20 w-56 rounded-xl border border-[#E8EDEA] bg-white shadow-lg py-1 ${
+              openUpward ? "bottom-6" : "top-6"
+            }`}
+          >
             <button
               type="button"
               className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#4A5E54] hover:bg-[#F5F7F5] transition-colors"
