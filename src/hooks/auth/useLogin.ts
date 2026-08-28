@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/api/auth.api";
+import { authErrorMessage, login } from "@/api/auth.api";
 
 export function useLogin() {
   const router = useRouter();
@@ -25,10 +25,9 @@ export function useLogin() {
     setIsSubmitting(true);
     try {
       await login({ email, password });
-      // Redirige vers le tableau de bord une fois connecté
-      router.push("/");
-    } catch {
-      setError("Impossible de vous connecter. Vérifiez vos identifiants.");
+      router.replace("/");
+    } catch (error) {
+      setError(authErrorMessage(error, "Impossible de vous connecter. Vérifiez vos identifiants."));
     } finally {
       setIsSubmitting(false);
     }

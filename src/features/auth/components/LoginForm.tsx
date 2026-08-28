@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, ArrowRight, AlertCircle, ShieldCheck } from "lucide-react";
-import { login } from "@/api/auth.api";
+import { authErrorMessage, login } from "@/api/auth.api";
 import { AuthField } from "./AuthField";
 import { AuthPasswordField } from "./AuthPasswordField";
 import { AuthCopy, AuthSwitch, AuthFormWrapper } from "./AuthHeading";
@@ -22,9 +22,9 @@ export function LoginForm() {
     setIsSubmitting(true);
     try {
       await login({ email, password });
-      router.push("/");
-    } catch {
-      setError("Adresse e-mail ou mot de passe incorrect.");
+      router.replace("/");
+    } catch (error) {
+      setError(authErrorMessage(error, "Adresse e-mail ou mot de passe incorrect."));
       setIsSubmitting(false);
     }
   }

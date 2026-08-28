@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { User, Mail, ArrowRight, AlertCircle } from "lucide-react";
-import { register } from "@/api/auth.api";
 import { AuthField } from "./AuthField";
 import { AuthPasswordField } from "./AuthPasswordField";
 import { AuthCopy, AuthSwitch, AuthFormWrapper } from "./AuthHeading";
+import { readRegisterDraft, saveRegisterDraft } from "../register-draft";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -14,29 +14,35 @@ export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    const draft = readRegisterDraft();
+    if (!draft) return;
+    setFullName(draft.fullName);
+    setEmail(draft.email);
+    setPassword(draft.password);
+  }, []);
+
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!acceptedTerms) return;
-    setError(null);
-    setIsSubmitting(true);
-    try {
-      await register({ fullName, email, password });
-      router.push("/");
-    } catch {
-      setError("Impossible de créer votre espace pour le moment. Réessayez.");
-      setIsSubmitting(false);
+    if (password.length < 8) {
+      setError("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
     }
+
+    setError(null);
+    saveRegisterDraft({ fullName, email, password });
+    router.push("/register/pharmacy");
   }
 
   return (
     <div className="auth-mode-view">
       <AuthCopy
-        eyebrow="Créer votre espace"
+        eyebrow="Étape 1 / 2 — votre compte"
         title="Votre pharmacie, enfin fluide."
-        description="Configurez PharmaOS et commencez à travailler avec votre équipe."
+        description="Créez d’abord votre accès. L’officine vient juste après, sur un écran séparé."
       />
 
       {error && (
@@ -92,8 +98,8 @@ export function RegisterForm() {
           J&apos;accepte les conditions d&apos;utilisation et la politique de confidentialité.
         </label>
 
-        <button type="submit" className="auth-submit" disabled={isSubmitting || !acceptedTerms}>
-          <span>{isSubmitting ? "Création..." : "Créer mon espace"}</span>
+        <button type="submit" className="auth-submit" disabled={!acceptedTerms}>
+          <span>Continuer</span>
           <ArrowRight strokeWidth={2} />
         </button>
       </AuthFormWrapper>

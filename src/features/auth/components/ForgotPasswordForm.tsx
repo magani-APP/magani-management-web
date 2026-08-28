@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, ArrowRight, AlertCircle } from "lucide-react";
-import { requestPasswordReset } from "@/api/auth.api";
+import { authErrorMessage, requestPasswordReset } from "@/api/auth.api";
 import { AuthField } from "./AuthField";
 import { AuthCopy, AuthBackLink, AuthFormWrapper } from "./AuthHeading";
 import { authContainerVariants, authItemVariants } from "./authMotion";
@@ -19,8 +19,9 @@ export function ForgotPasswordForm() {
     setIsSubmitting(true);
     try {
       await requestPasswordReset({ email });
-    } catch {
-      setError("Impossible d'envoyer le lien pour le moment. Réessayez.");
+    } catch (error) {
+      setError(authErrorMessage(error, "Impossible d'envoyer le lien pour le moment. Réessayez."));
+    } finally {
       setIsSubmitting(false);
     }
   }

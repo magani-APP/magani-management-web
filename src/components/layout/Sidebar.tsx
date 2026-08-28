@@ -15,7 +15,7 @@ import {
   ChevronDown,
   HeartPulse,
 } from "lucide-react";
-import { User, Pharmacy } from "../../api/core.api";
+import type { User, Pharmacy } from "../../api/core.api";
 
 interface SidebarProps {
   user: User | null;

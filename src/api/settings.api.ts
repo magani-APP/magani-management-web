@@ -13,6 +13,7 @@ import {
   TeamMember,
   TeamMemberStatus,
 } from "@/types/settings";
+import { logoutAll } from "@/api/auth.api";
 
 export type { PaymentMethod, PharmacySettings, SecuritySettings, StockSetting, TeamMember, TeamMemberStatus };
 
@@ -106,6 +107,5 @@ export const updateTwoFactorStatus = async (enabled: boolean): Promise<void> => 
 };
 
 export const disconnectAllSessions = async (): Promise<void> => {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await logoutAll();
 };

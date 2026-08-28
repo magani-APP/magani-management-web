@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { register } from "@/api/auth.api";
+import { readRegisterDraft, saveRegisterDraft } from "@/features/auth/register-draft";
 
 export function useRegister() {
   const router = useRouter();
@@ -14,6 +14,14 @@ export function useRegister() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const draft = readRegisterDraft();
+    if (!draft) return;
+    setFullName(draft.fullName);
+    setEmail(draft.email);
+    setPassword(draft.password);
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -33,15 +41,9 @@ export function useRegister() {
     }
 
     setIsSubmitting(true);
-    try {
-      await register({ fullName, email, password});
-      // Redirige vers le tableau de bord une fois l'espace créé
-      router.push("/");
-    } catch {
-      setError("Impossible de créer votre espace pour le moment.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    saveRegisterDraft({ fullName, email, password });
+    router.push("/register/pharmacy");
+    setIsSubmitting(false);
   };
 
   return {
