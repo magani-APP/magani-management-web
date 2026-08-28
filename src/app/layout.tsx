@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-    title: "Magali",
+    title: "Magani officine",
     description: "Système de gestion de pharmacie",
 };
 
