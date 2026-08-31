@@ -12,7 +12,7 @@ interface AuthVisualPanelProps {
   chapter: string;
   headline: ReactNode;
   description: string;
-  floatCards: ReactNode;
+  floatCards?: ReactNode;
 }
 
 const TRUST_STATS: TrustStat[] = [
@@ -34,13 +34,6 @@ export function AuthVisualPanel({ panelKey, image, chapter, headline, descriptio
         style={{ objectFit: "cover", objectPosition: "60% center" }}
         className="auth-visual-background"
       />
-
-      <div className="auth-visual-topline">
-        <span className="auth-live-dot" />
-        <span className="auth-topline-status" >Système opérationnel</span>
-        <span className="auth-visual-chapter">{chapter}</span>
-        <strong className="auth-topline-metric">99,9%</strong>
-      </div>
 
       <div className="auth-visual-copy">
         <p>{headline}</p>

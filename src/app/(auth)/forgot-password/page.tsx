@@ -28,12 +28,6 @@ export default function ForgotPasswordPage() {
             </>
           }
           description="Tout ce qu’il faut pour piloter une pharmacie sereinement, du comptoir à la réserve."
-          floatCards={
-            <>
-              <AuthFloatCard icon={PackageCheck} label="Stock synchronisé" value="2 847 articles" badge="À jour" variant="stock" />
-              <AuthFloatCard icon={Sparkles} label="Vente enregistrée" value="+ 12 500 FCFA" pulse variant="sale" />
-            </>
-          }
         />
       }
     >

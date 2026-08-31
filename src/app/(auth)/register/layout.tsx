@@ -22,24 +22,6 @@ export default function RegisterLayout({ children }: { children: ReactNode }) {
             </>
           }
           description="Créez un espace commun où le catalogue, l’équipe et les opérations avancent au même rythme."
-          floatCards={
-            <>
-              <AuthFloatCard
-                icon={PackageCheck}
-                label="Catalogue importé"
-                value="2 847 références"
-                badge="Prêt"
-                variant="stock"
-              />
-              <AuthFloatCard
-                icon={Sparkles}
-                label="Équipe invitée"
-                value="5 membres"
-                pulse
-                variant="sale"
-              />
-            </>
-          }
         />
       }
     >
