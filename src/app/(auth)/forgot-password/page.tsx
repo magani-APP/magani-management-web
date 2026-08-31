@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function ForgotPasswordPage() {
   return (
     <AuthPageShell
-      panelKey="login"
+      panelKey="forgot-password"
       mobileImage="/images/login.png"
       visualPanel={
         <AuthVisualPanel

@@ -6,10 +6,10 @@ interface AuthFloatCardProps {
   value: string;
   badge?: string;
   pulse?: boolean;
-  /** Positioning variant, mapped to the auth-float-{variant} modifier class */
   variant: "stock" | "sale";
 }
 
+// AuthFloatCard.tsx
 export function AuthFloatCard({ icon: Icon, label, value, badge, pulse = false, variant }: AuthFloatCardProps) {
   return (
     <div className={`auth-float-card auth-float-${variant}`}>

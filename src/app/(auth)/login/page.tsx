@@ -6,8 +6,8 @@ import { AuthFloatCard } from "@/features/auth/components/AuthFloatCard";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
 export const metadata: Metadata = {
-  title: "Connexion — PharmaOS",
-  description: "Connectez-vous à votre espace PharmaOS.",
+  title: "Magani",
+  description: "Connectez-vous à votre espace Magani.",
 };
 
 export default function LoginPage() {

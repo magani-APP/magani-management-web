@@ -7,7 +7,7 @@ interface TrustStat {
 }
 
 interface AuthVisualPanelProps {
-  panelKey: string; // nouveau — identifiant unique de la page (ex. "login", "forgot-password")
+  panelKey: string;
   image: string;
   chapter: string;
   headline: ReactNode;
@@ -37,9 +37,9 @@ export function AuthVisualPanel({ panelKey, image, chapter, headline, descriptio
 
       <div className="auth-visual-topline">
         <span className="auth-live-dot" />
-        <span>Système opérationnel</span>
+        <span className="auth-topline-status" >Système opérationnel</span>
         <span className="auth-visual-chapter">{chapter}</span>
-        <strong>99,9%</strong>
+        <strong className="auth-topline-metric">99,9%</strong>
       </div>
 
       <div className="auth-visual-copy">

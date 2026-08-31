@@ -5,7 +5,6 @@ import { LockKeyhole, Eye, EyeOff } from "lucide-react";
 
 interface AuthPasswordFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  /** Rendered next to the label, e.g. a "Mot de passe oublié ?" button */
   labelExtra?: ReactNode;
 }
 
