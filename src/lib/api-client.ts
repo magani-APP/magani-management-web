@@ -67,8 +67,10 @@ async function rotateSession(refreshToken?: string): Promise<string | null> {
     });
     persistTokens(session.accessToken, session.refreshToken);
     return session.accessToken;
-  } catch {
-    clearTokens();
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      clearTokens();
+    }
     return null;
   }
 }
@@ -123,13 +125,28 @@ export async function apiRequest<T>(
 
   const payload = await readEnvelope<T>(response);
   if (!response.ok || payload.success === false) {
+    const message =
+      payload.error?.message ??
+      (response.status === 429
+        ? "Trop de requêtes. Réessayez dans un instant."
+        : "Une erreur est survenue.");
     throw new ApiError(
       response.status,
-      payload.error?.code ?? "ERROR",
-      payload.error?.message ?? "Une erreur est survenue.",
+      payload.error?.code ?? (response.status === 429 ? "RATE_LIMITED" : "ERROR"),
+      message,
       payload.error?.details,
     );
   }
 
   return payload.data as T;
+}
+
+export function isAuthFailure(error: unknown): boolean {
+  return (
+    error instanceof ApiError &&
+    (error.status === 401 ||
+      error.code === "UNAUTHORIZED" ||
+      error.code === "TOKEN_EXPIRED" ||
+      error.code === "INVALID_TOKEN")
+  );
 }

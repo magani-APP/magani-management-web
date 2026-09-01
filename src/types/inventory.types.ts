@@ -7,7 +7,7 @@ export interface ProductLot {
   expirationDate: string; // ISO 8601
 }
 
-export type MovementType = 'vente' | 'reapprovisionnement';
+export type MovementType = 'vente' | 'reapprovisionnement' | 'ajustement';
 
 export interface ProductMovement {
   id: string;
@@ -23,6 +23,7 @@ export interface InventoryProduct {
   name: string;
   code: string;
   category: string;
+  categoryId?: string;
   imageUrl?: string;
   salePrice: number;
   stock: number;

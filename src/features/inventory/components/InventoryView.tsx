@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Search,
   Package2,
@@ -23,6 +23,8 @@ import { formatPrice, formatDate, formatCompactCFA } from '@/utils/format.util';
 import { useInventoryProducts } from '@/hooks/ProduitsStock/useInventoryProducts';
 import { useInventoryCatalog } from '@/hooks/ProduitsStock/useInventoryCatalog';
 import { ProductDetailDrawer } from '@/features/inventory/components/ProductDetailDrawer';
+import { AddProductModal } from '@/features/inventory/components/AddProductModal';
+import { RestockModal } from '@/features/inventory/components/RestockModal';
 
 function TrendBadge({ value }: { value: number | null }) {
   if (value === null) {
@@ -93,12 +95,33 @@ function getMarginBarColor(percent: number) {
 const TABLE_HEADERS = ['Produit', 'Catégorie', 'Prix vente', 'Stock', 'Expiration', 'Marge', 'Statut'];
 
 export function InventoryView() {
-  const { products, stats } = useInventoryProducts();
+  const {
+    products,
+    stats,
+    addProduct,
+    editProduct,
+    restockProduct,
+    removeProduct,
+    loadProductDetail,
+    isAdding,
+    isUpdating,
+    isRestocking,
+    isDeleting,
+  } = useInventoryProducts();
   const { searchQuery, setSearchQuery, activeFilter, setActiveFilter, filteredProducts } =
     useInventoryCatalog(products);
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [restockProductId, setRestockProductId] = useState<string | null>(null);
   const selectedProduct = products.find((p) => p.id === selectedProductId) ?? null;
+  const restockTarget = products.find((p) => p.id === restockProductId) ?? null;
+
+  useEffect(() => {
+    if (!selectedProductId) return;
+    void loadProductDetail(selectedProductId);
+  }, [selectedProductId, loadProductDetail]);
 
   const toggleProductDetail = (productId: string) => {
     setSelectedProductId((prev) => (prev === productId ? null : productId));
@@ -249,6 +272,7 @@ export function InventoryView() {
               </button>
               <button
                 type="button"
+                onClick={() => setIsAddOpen(true)}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-white text-[10px] font-bold hover:opacity-90"
                 style={{ background: 'rgb(11, 143, 104)' }}
               >
@@ -333,7 +357,7 @@ export function InventoryView() {
                           </td>
 
                           <td className="px-4 py-3 text-[10px] text-[#6B7A6F] font-mono whitespace-nowrap">
-                            {formatDate(product.expirationDate)}
+                            {product.expirationDate ? formatDate(product.expirationDate) : '—'}
                           </td>
 
                           <td className="px-4 py-3">
@@ -387,9 +411,54 @@ export function InventoryView() {
 
         {/* PANNEAU DÉTAIL */}
         {selectedProduct && (
-          <ProductDetailDrawer product={selectedProduct} onClose={() => setSelectedProductId(null)} />
+          <ProductDetailDrawer
+            product={selectedProduct}
+            onClose={() => setSelectedProductId(null)}
+            onEdit={() => setIsEditOpen(true)}
+            onRestock={() => setRestockProductId(selectedProduct.id)}
+            onDelete={async (product) => {
+              await removeProduct(product.id);
+              setSelectedProductId(null);
+            }}
+            isDeleting={isDeleting}
+          />
         )}
       </div>
+
+      <AddProductModal
+        isOpen={isAddOpen}
+        isSubmitting={isAdding}
+        onClose={() => setIsAddOpen(false)}
+        onSubmit={async (input) => {
+          await addProduct(input);
+          setIsAddOpen(false);
+        }}
+      />
+
+      <AddProductModal
+        isOpen={isEditOpen && Boolean(selectedProduct)}
+        isSubmitting={isUpdating}
+        product={selectedProduct}
+        onClose={() => setIsEditOpen(false)}
+        onSubmit={async (input) => {
+          if (!selectedProduct) return;
+          await editProduct(selectedProduct.id, input);
+          setIsEditOpen(false);
+          await loadProductDetail(selectedProduct.id);
+        }}
+      />
+
+      <RestockModal
+        product={restockTarget}
+        isSubmitting={isRestocking}
+        onClose={() => setRestockProductId(null)}
+        onSubmit={async (input) => {
+          if (!restockProductId) return;
+          await restockProduct({ productId: restockProductId, ...input });
+          setRestockProductId(null);
+          await loadProductDetail(restockProductId);
+        }}
+      />
     </div>
   );
 }

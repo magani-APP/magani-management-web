@@ -1,26 +1,29 @@
 'use client';
 
 import React from 'react';
-import { X, Pen, Plus, Archive, Activity } from 'lucide-react';
+import { X, Pen, Plus, Archive, Activity, Trash2 } from 'lucide-react';
 import { TOKENS } from '@/constants/design-tokens.constants';
 import { InventoryProduct } from '@/types/inventory.types';
 import { STATUS_CONFIG, MOVEMENT_LABELS } from '@/constants/inventory.constants';
 import { formatPrice, formatDate, formatShortDate } from '@/utils/format.util';
 import { ProductAvatar } from '@/features/inventory/components/ProductAvatar';
+import { inventoryErrorMessage } from '@/api/inventory.api';
 
 interface ProductDetailDrawerProps {
   product: InventoryProduct;
   onClose: () => void;
   onEdit?: (product: InventoryProduct) => void;
   onRestock?: (product: InventoryProduct) => void;
+  onDelete?: (product: InventoryProduct) => Promise<void> | void;
+  isDeleting?: boolean;
 }
 
-/** Styles de badge de statut — classes exactes relevées dans l'inspecteur */
+/** Styles de badge de statut — alignés sur les libellés de STATUS_CONFIG */
 const STATUS_STYLES: Record<string, { badge: string; dot: string }> = {
-  in_stock: { badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
-  low: { badge: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-400' },
-  critical: { badge: 'bg-red-50 text-red-700 border-red-200', dot: 'bg-red-500' },
-  expired: { badge: 'bg-gray-100 text-gray-500 border-gray-200', dot: 'bg-gray-400' },
+  'en-stock': { badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
+  'stock-bas': { badge: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-400' },
+  critique: { badge: 'bg-red-50 text-red-700 border-red-200', dot: 'bg-red-500' },
+  expire: { badge: 'bg-gray-100 text-gray-500 border-gray-200', dot: 'bg-gray-400' },
 };
 
 /** Carte stat — fond gris clair, coins rounded-xl, valeur en text-xs, conforme à l'inspecteur */
@@ -35,9 +38,23 @@ function StatCard({ label, value, valueColor }: { label: string; value: React.Re
   );
 }
 
-export function ProductDetailDrawer({ product, onClose, onEdit, onRestock }: ProductDetailDrawerProps) {
+export function ProductDetailDrawer({
+  product,
+  onClose,
+  onEdit,
+  onRestock,
+  onDelete,
+  isDeleting,
+}: ProductDetailDrawerProps) {
   const status = STATUS_CONFIG[product.status];
-  const statusStyle = STATUS_STYLES[product.status] ?? STATUS_STYLES.in_stock;
+  const statusStyle = STATUS_STYLES[product.status] ?? STATUS_STYLES['en-stock'];
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
+  const [deleteError, setDeleteError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setConfirmDelete(false);
+    setDeleteError(null);
+  }, [product.id]);
 
   return (
     <aside
@@ -71,7 +88,7 @@ export function ProductDetailDrawer({ product, onClose, onEdit, onRestock }: Pro
       {/* CONTENU SCROLLABLE — structure conforme à l'inspecteur */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5 no-scrollbar" style={{ scrollbarWidth: 'none' }}>
         {/* STATUT + ACTIONS */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between gap-2 flex-wrap">
           <span
             className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusStyle.badge}`}
           >
@@ -79,7 +96,7 @@ export function ProductDetailDrawer({ product, onClose, onEdit, onRestock }: Pro
             {status.label}
           </span>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
             <button
               type="button"
               onClick={() => onEdit?.(product)}
@@ -95,8 +112,58 @@ export function ProductDetailDrawer({ product, onClose, onEdit, onRestock }: Pro
             >
               <Plus size={10} /> Approvisionner
             </button>
+            {onDelete && (
+              <button
+                type="button"
+                onClick={() => {
+                  setDeleteError(null);
+                  setConfirmDelete(true);
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-red-100 text-[10px] font-bold text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <Trash2 size={10} /> Supprimer
+              </button>
+            )}
           </div>
         </div>
+
+        {confirmDelete && (
+          <div className="rounded-xl border border-red-100 bg-red-50 px-3 py-3">
+            <p className="text-[11px] font-medium text-red-700">
+              Supprimer {product.name} du stock ? Cette action est définitive.
+            </p>
+            {deleteError && (
+              <p className="text-[11px] font-medium text-red-600 mt-2">{deleteError}</p>
+            )}
+            <div className="flex justify-end gap-2 mt-3">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => {
+                  setConfirmDelete(false);
+                  setDeleteError(null);
+                }}
+                className="px-2.5 py-1.5 rounded-xl bg-white border border-[#E8EDEA] text-[10px] font-bold text-[#6B7A6F] disabled:opacity-60"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={async () => {
+                  try {
+                    await onDelete?.(product);
+                  } catch (err) {
+                    setDeleteError(inventoryErrorMessage(err, 'Impossible de supprimer ce produit.'));
+                  }
+                }}
+                className="px-2.5 py-1.5 rounded-xl bg-red-600 text-white text-[10px] font-bold hover:opacity-90 disabled:opacity-60"
+              >
+                {isDeleting ? 'Suppression...' : 'Confirmer'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* CARTES INFO */}
         <div className="grid grid-cols-2 gap-2">
@@ -107,7 +174,7 @@ export function ProductDetailDrawer({ product, onClose, onEdit, onRestock }: Pro
             valueColor="rgb(11, 143, 104)"
           />
           <StatCard label="Stock actuel" value={`${product.stock} unités`} />
-          <StatCard label="Expiration lot" value={formatDate(product.expirationDate)} />
+          <StatCard label="Expiration lot" value={product.expirationDate ? formatDate(product.expirationDate) : '—'} />
         </div>
 
         {/* LOTS EN STOCK */}
@@ -124,7 +191,9 @@ export function ProductDetailDrawer({ product, onClose, onEdit, onRestock }: Pro
               >
                 <span className="text-[10px] font-mono text-[#6B7A6F] flex-1">{lot.code}</span>
                 <span className="text-[10px] font-bold text-[#0F1A15]">{lot.quantity} u.</span>
-                <span className="text-[9px] text-[#9AAEA3]">exp. {formatShortDate(lot.expirationDate)}</span>
+                <span className="text-[9px] text-[#9AAEA3]">
+                  exp. {lot.expirationDate ? formatShortDate(lot.expirationDate) : '—'}
+                </span>
               </div>
             ))}
             {(product.lots ?? []).length === 0 && (

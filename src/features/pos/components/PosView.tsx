@@ -78,35 +78,6 @@ export function PosView() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showCheckoutSuccess, handleCancelCheckout, searchInputRef]);
 
-  // --- BLOCAGE DU SCROLL DE LA PAGE (html/body) ---
-  // On verrouille le scroll global le temps que ce composant soit monté,
-  // sans toucher aux zones internes qui ont leur propre overflow-y-auto.
-  useEffect(() => {
-    const htmlEl = document.documentElement;
-    const bodyEl = document.body;
-
-    const prevHtmlOverflow = htmlEl.style.overflow;
-    const prevBodyOverflow = bodyEl.style.overflow;
-    const prevHtmlHeight = htmlEl.style.height;
-    const prevBodyHeight = bodyEl.style.height;
-    const prevBodyOverscroll = bodyEl.style.overscrollBehavior;
-
-    htmlEl.style.overflow = 'hidden';
-    bodyEl.style.overflow = 'hidden';
-    htmlEl.style.height = '100%';
-    bodyEl.style.height = '100%';
-    bodyEl.style.overscrollBehavior = 'none';
-
-    return () => {
-      htmlEl.style.overflow = prevHtmlOverflow;
-      bodyEl.style.overflow = prevBodyOverflow;
-      htmlEl.style.height = prevHtmlHeight;
-      bodyEl.style.height = prevBodyHeight;
-      bodyEl.style.overscrollBehavior = prevBodyOverscroll;
-    };
-  }, []);
-
-  // --- VENTES EN ATTENTE : molette verticale -> scroll horizontal ---
   const heldSalesScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -121,7 +92,7 @@ export function PosView() {
     };
 
     const handleWheel = (e: WheelEvent) => {
-      if (el.scrollWidth <= el.clientWidth) return; // rien à scroller
+      if (el.scrollWidth <= el.clientWidth) return;
       if (e.deltaY === 0) return;
       el.scrollLeft += e.deltaY;
       e.preventDefault();
@@ -141,9 +112,8 @@ export function PosView() {
 
   return (
     <div
-      className="flex w-full text-[#0F1A15] overflow-hidden min-h-0"
+      className="flex w-full h-full min-h-0 text-[#0F1A15] overflow-hidden"
       style={{
-        height: '100dvh',
         backgroundColor: TOKENS.bg,
         fontFamily:
           "'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
@@ -159,9 +129,7 @@ export function PosView() {
         * { box-sizing: border-box; }
 
         html, body {
-          overflow: hidden;
           overscroll-behavior: none;
-          height: 100%;
         }
 
         .font-tabular { font-family: 'Geist Mono', ui-monospace, monospace; font-feature-settings: "tnum" 1; }

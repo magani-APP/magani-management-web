@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Search,
   Bell,
@@ -27,6 +29,8 @@ const MONTHS_FR = [
 ];
 
 export function Topbar() {
+  const pathname = usePathname();
+  const isNewSale = pathname.startsWith("/pos");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
@@ -143,10 +147,17 @@ export function Topbar() {
         </button>
 
         {/* New Sale CTA */}
-        <button className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-primary text-white rounded-4xl text-[12px] font-bold shadow-button hover:bg-brand-deep active:scale-95 transition-all">
+        <Link
+          href="/pos"
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-4xl text-[12px] font-bold shadow-button active:scale-95 transition-all ${
+            isNewSale
+              ? "bg-brand-deep text-white"
+              : "bg-brand-primary text-white hover:bg-brand-deep"
+          }`}
+        >
           <Plus size={14} strokeWidth={3} />
           Nouvelle vente
-        </button>
+        </Link>
       </div>
     </header>
   );

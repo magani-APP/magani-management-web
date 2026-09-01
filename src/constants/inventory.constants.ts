@@ -9,6 +9,18 @@ export const INVENTORY_FILTERS: InventoryFilterLabel[] = [
   'Expiré',
 ];
 
+export const PRODUCT_UNIT_OPTIONS = [
+  'comprimé',
+  'gélule',
+  'sirop',
+  'sachet',
+  'crème',
+  'injectable',
+  'spray',
+  'flacon',
+  'unité',
+] as const;
+
 // Seuils métier (cf. tableau Produits & Stock)
 export const CRITICAL_STOCK_THRESHOLD = 15;
 export const LOW_STOCK_THRESHOLD = 30;
@@ -70,4 +82,5 @@ export const getMarginColor = (percent: number): string => {
 export const MOVEMENT_LABELS: Record<MovementType, string> = {
   vente: 'Vente',
   reapprovisionnement: 'Réapprovisionnement',
+  ajustement: 'Ajustement',
 };
