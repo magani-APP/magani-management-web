@@ -1,4 +1,5 @@
 import React from "react";
+import { cookies } from "next/headers";
 import { DashboardHeader } from "../../features/dashboard/components/DashboardHeader";
 import { KpiGrid } from "../../features/dashboard/components/KpiGrid";
 import { RevenueChart } from "../../features/dashboard/components/RevenueChart";
@@ -12,24 +13,31 @@ import {
   getPaymentDistribution,
   getActiveAlerts,
   getTopProducts,
-  getOwnerStats
+  getOwnerStats,
 } from "../../api/dashboard.api";
+import { ACCESS_COOKIE, REFRESH_COOKIE } from "../../lib/auth-session";
 
 export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const tokens = {
+    accessToken: cookieStore.get(ACCESS_COOKIE)?.value,
+    refreshToken: cookieStore.get(REFRESH_COOKIE)?.value,
+  };
+
   const [
     kpis,
     revenueData,
     paymentData,
     alertsData,
     topProductsData,
-    ownerStatsData
+    ownerStatsData,
   ] = await Promise.all([
-    getDashboardKpis(),
+    getDashboardKpis(tokens),
     getRevenueChartData(),
     getPaymentDistribution(),
-    getActiveAlerts(),
-    getTopProducts(),
-    getOwnerStats()
+    getActiveAlerts(tokens),
+    getTopProducts(tokens),
+    getOwnerStats(),
   ]);
 
   return (

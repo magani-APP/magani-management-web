@@ -24,7 +24,7 @@ import { useInventoryCatalog } from '../../../hooks/CaissePOS/usePosCatalog';
 import { usePosCart } from '../../../hooks/CaissePOS/usePosCart';
 
 export function PosView() {
-  const { products } = useProducts();
+  const { products, refetch } = useProducts();
 
   const {
     searchQuery,
@@ -48,6 +48,8 @@ export function PosView() {
     subtotal,
     discountAmount,
     finalTotal,
+    isCheckingOut,
+    checkoutError,
     handleAddToCart,
     handleUpdateQuantity,
     handleRemoveCartItem,
@@ -59,7 +61,7 @@ export function PosView() {
     handleCancelCheckout,
     handleDownloadPDF,
     closeSuccessModal,
-  } = usePosCart(products);
+  } = usePosCart(products, refetch);
 
   // --- RACCOURCIS ---
   useEffect(() => {
@@ -578,8 +580,13 @@ export function PosView() {
 
           {/* BOUTON ENCAISSER */}
           <div className="px-4 pb-4">
+            {checkoutError && (
+              <p className="text-[11px] text-red-600 font-medium mb-2 text-center">
+                {checkoutError}
+              </p>
+            )}
             <button
-              disabled={cart.length === 0}
+              disabled={cart.length === 0 || isCheckingOut}
               onClick={handleCheckout}
               className="w-full py-4 rounded-2xl text-white font-bold text-sm tracking-tight transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
               style={{
@@ -587,7 +594,11 @@ export function PosView() {
                 boxShadow: '0 4px 20px rgba(11,143,104,0.40)',
               }}
             >
-              {cart.length > 0 ? `Encaisser · ${formatPrice(finalTotal)} FCFA` : 'Encaisser'}
+              {isCheckingOut
+                ? 'Encaissement…'
+                : cart.length > 0
+                ? `Encaisser · ${formatPrice(finalTotal)} FCFA`
+                : 'Encaisser'}
             </button>
 
             <div className="flex gap-3 justify-center mt-2.5">
@@ -598,13 +609,13 @@ export function PosView() {
               >
                 Mettre en attente
               </button>
-              <span className="text-[#E8EDEA]">·</span>
+              <span className="text-[10px] text-[#E8EDEA]">·</span>
               <button
                 disabled={cart.length === 0}
                 onClick={handleClearCart}
-                className="text-[10px] text-[#9AAEA3] hover:text-red-500 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                className="text-[10px] text-[#9AAEA3] hover:text-red-600 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Annuler la vente
+                Vider le panier
               </button>
             </div>
           </div>
