@@ -44,6 +44,7 @@ export function AuthShowcasePanel({
         alt=""
         fill
         priority
+        loading="eager" 
         sizes="50vw"
         className="object-cover"
       />
@@ -56,11 +57,11 @@ export function AuthShowcasePanel({
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-accent opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-accent" />
           </span>
-          <span>Système opérationnel</span>
-          <span className="ml-auto rounded-full bg-white/10 px-2.5 py-1 font-mono text-[10px] tracking-normal text-white/60">
+          <span className="auth-status-label">Système opérationnel</span>
+          <span className="auth-status-steps">
             {String(step).padStart(2, "0")} / {String(totalSteps).padStart(2, "0")}
           </span>
-          <strong className="text-[13px] font-bold text-white">99,9%</strong>
+          <strong className="auth-status-uptime">99,9%</strong>
         </div>
 
         <div className="mt-14 max-w-md xl:mt-20">

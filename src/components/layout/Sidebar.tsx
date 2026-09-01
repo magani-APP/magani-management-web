@@ -1,7 +1,8 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -14,8 +15,10 @@ import {
   Info,
   ChevronDown,
   HeartPulse,
+  LogOut,
 } from "lucide-react";
 import type { User, Pharmacy } from "../../api/core.api";
+import { logout } from "@/api/auth.api";
 
 interface SidebarProps {
   user: User | null;
@@ -49,6 +52,19 @@ const NAV_GROUPS = [
 
 export function Sidebar({ user, pharmacy }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      router.replace("/login");
+    }
+  }
 
   return (
     <aside className="fixed left-2 top-2 bottom-2 w-[228px] rounded-2xl bg-white/88 backdrop-blur-[24px] saturate-180 border border-border-glass shadow-sidebar flex flex-col z-20">
@@ -121,21 +137,51 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
             Aide & documentation
           </Link>
 
-          <div className="flex items-center justify-between p-3 rounded-3xl hover:bg-surface-muted transition-colors cursor-pointer border border-transparent">
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center text-[11px] font-bold shrink-0">
-                {user?.initials || "..."}
+          <div ref={menuRef} className="relative">
+            {isMenuOpen && (
+              <>
+                {/* Zone invisible pour fermer le menu au clic extérieur */}
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setIsMenuOpen(false)}
+                />
+                <div className="absolute bottom-full left-0 right-0 mb-2 z-20 rounded-2xl border border-border-card bg-white shadow-card overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-xs font-semibold text-status-danger hover:bg-status-danger-bg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <LogOut size={15} />
+                    {isLoggingOut ? "Déconnexion..." : "Se déconnecter"}
+                  </button>
+                </div>
+              </>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setIsMenuOpen((open) => !open)}
+              className="flex w-full items-center justify-between p-3 rounded-3xl hover:bg-surface-muted transition-colors cursor-pointer border border-transparent"
+            >
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center text-[11px] font-bold shrink-0">
+                  {user?.initials || "..."}
+                </div>
+                <div className="overflow-hidden text-left">
+                  <p className="text-text-primary text-[13px] font-bold leading-tight truncate group-hover:text-brand-primary transition-colors">
+                    {user?.name || "Chargement..."}
+                  </p>
+                  <p className="text-text-placeholder text-[11px] font-medium leading-tight truncate">
+                    {user?.role || "..."}
+                  </p>
+                </div>
               </div>
-              <div className="overflow-hidden">
-                <p className="text-text-primary text-[13px] font-bold leading-tight truncate group-hover:text-brand-primary transition-colors">
-                  {user?.name || "Chargement..."}
-                </p>
-                <p className="text-text-placeholder text-[11px] font-medium leading-tight truncate">
-                  {user?.role || "..."}
-                </p>
-              </div>
-            </div>
-            <ChevronDown size={14} className="text-text-placeholder shrink-0 ml-2" />
+              <ChevronDown
+                size={14}
+                className={`text-text-placeholder shrink-0 ml-2 transition-transform ${isMenuOpen ? "rotate-180" : ""}`}
+              />
+            </button>
           </div>
         </div>
       </div>

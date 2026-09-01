@@ -6,8 +6,8 @@ import { AuthFloatCard } from "@/features/auth/components/AuthFloatCard";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 
 export const metadata: Metadata = {
-  title: "Connexion — PharmaOS",
-  description: "Connectez-vous à votre espace PharmaOS.",
+  title: "Magani",
+  description: "Connectez-vous à votre espace Magani.",
 };
 
 export default function LoginPage() {
@@ -28,24 +28,6 @@ export default function LoginPage() {
             </>
           }
           description="Tout ce qu’il faut pour piloter une pharmacie sereinement, du comptoir à la réserve."
-          floatCards={
-            <>
-              <AuthFloatCard
-                icon={PackageCheck}
-                label="Stock synchronisé"
-                value="2 847 articles"
-                badge="À jour"
-                variant="stock"
-              />
-              <AuthFloatCard
-                icon={Sparkles}
-                label="Vente enregistrée"
-                value="+ 12 500 FCFA"
-                pulse
-                variant="sale"
-              />
-            </>
-          }
         />
       }
     >

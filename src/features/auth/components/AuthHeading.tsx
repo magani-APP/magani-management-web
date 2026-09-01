@@ -7,19 +7,22 @@ import { ArrowLeft, ShieldCheck } from "lucide-react";
 interface AuthBackLinkProps {
   href: string;
   label: string;
+  className?: string;
 }
 
-export function AuthBackLink({ href, label }: AuthBackLinkProps) {
+export function AuthBackLink({ href, label, className }: AuthBackLinkProps) {
   const router = useRouter();
-
   return (
-    <button type="button" className="auth-back-link" onClick={() => router.push(href)}>
+    <button
+      type="button"
+      className={`auth-back-link ${className ?? ""}`.trim()}
+      onClick={() => router.push(href)}
+    >
       <ArrowLeft strokeWidth={2} aria-hidden="true" />
       {label}
     </button>
   );
 }
-
 
 interface AuthCopyProps {
   eyebrow: string;

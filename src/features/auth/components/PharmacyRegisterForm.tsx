@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, MapPin, MapPinned, Phone, ArrowRight, AlertCircle } from "lucide-react";
-import { authErrorMessage, registerPharmacy } from "@/api/auth.api";
+import { authErrorMessage, registerPharmacy, logout} from "@/api/auth.api";
 import { AuthField } from "./AuthField";
 import { AuthCopy, AuthBackLink, AuthFormWrapper } from "./AuthHeading";
 import { clearRegisterDraft, readRegisterDraft } from "../register-draft";
@@ -63,8 +63,9 @@ export function PharmacyRegisterForm() {
           longitude: coordinates.longitude,
         },
       });
+      await logout();
       clearRegisterDraft();
-      router.replace("/");
+      router.replace("/login");
     } catch (submitError) {
       setError(authErrorMessage(submitError, "Impossible de créer votre espace pour le moment. Réessayez."));
       setIsSubmitting(false);
@@ -73,7 +74,7 @@ export function PharmacyRegisterForm() {
 
   return (
     <div className="auth-mode-view">
-      <AuthBackLink href="/register" label="Retour au compte" />
+      <AuthBackLink href="/register" label="Retour au compte" className="auth-back-link-pharmacy" />
 
       <AuthCopy
         eyebrow="Étape 2 / 2 — votre officine"

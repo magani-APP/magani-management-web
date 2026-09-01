@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, ArrowRight, AlertCircle, ShieldCheck } from "lucide-react";
+import { Mail, ArrowRight, AlertCircle } from "lucide-react";
 import { authErrorMessage, login } from "@/api/auth.api";
 import { AuthField } from "./AuthField";
 import { AuthPasswordField } from "./AuthPasswordField";
 import { AuthCopy, AuthSwitch, AuthFormWrapper } from "./AuthHeading";
-
 
 export function LoginForm() {
   const router = useRouter();

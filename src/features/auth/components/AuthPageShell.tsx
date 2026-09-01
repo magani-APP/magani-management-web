@@ -16,7 +16,9 @@ export function AuthPageShell({ panelKey, mobileImage, children, visualPanel }: 
         <div className="auth-form-inner">
           <AuthTopbar panelKey={panelKey} mobileImage={mobileImage} />
           <div className="auth-mode-stage">{children}</div>
-          <AuthSecureNote />
+          <div className={`auth-secure-note-wrap auth-secure-note-${panelKey}`}>
+            <AuthSecureNote />
+          </div>
         </div>
       </section>
       {visualPanel}

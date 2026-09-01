@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Pill, LayoutDashboard, ArrowRight, Sparkles } from "lucide-react";
+import { Pill, Sparkles } from "lucide-react";
 
 interface AuthTopbarProps {
   panelKey: string; // nouveau
@@ -11,26 +10,18 @@ interface AuthTopbarProps {
 }
 
 export function AuthTopbar({ panelKey, mobileImage }: AuthTopbarProps) {
-  const router = useRouter();
-
   return (
     <>
       <div className="auth-topbar">
-        <Link href="/" className="auth-brand" aria-label="PharmaOS — accueil">
+        <Link href="/" className="auth-brand" aria-label="Magani — accueil">
           <span className="auth-brand-mark">
             <Pill strokeWidth={2.4} />
           </span>
           <span>
-            <strong>PharmaOS</strong>
+            <strong>Magani</strong>
             <small>Votre pharmacie, maîtrisée.</small>
           </span>
         </Link>
-
-        <button type="button" className="auth-dashboard-shortcut" onClick={() => router.push("/")}>
-          <LayoutDashboard strokeWidth={2} />
-          <span>Voir le dashboard</span>
-          <ArrowRight strokeWidth={2} />
-        </button>
       </div>
 
       {/* Visuel mobile uniquement, remplace le panneau latéral sur petit écran */}
@@ -38,7 +29,7 @@ export function AuthTopbar({ panelKey, mobileImage }: AuthTopbarProps) {
         <Image key={panelKey} src={mobileImage} alt="" fill style={{ objectFit: "cover" }} />
         <span>
           <Sparkles strokeWidth={2} />
-          PharmaOS
+          Magani
         </span>
       </div>
     </>
