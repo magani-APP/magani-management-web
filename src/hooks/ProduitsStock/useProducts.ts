@@ -1,11 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getProducts } from '../../api/pos.api';
 import { Product } from '../../types/pos.types';
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
+
+  const refetch = useCallback(async () => {
+    const data = await getProducts();
+    setProducts(data);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -19,5 +24,5 @@ export function useProducts() {
     };
   }, []);
 
-  return { products };
+  return { products, refetch };
 }
