@@ -9,6 +9,7 @@ export const SETTINGS_TABS: { id: SettingsTabId; label: string }[] = [
   { id: "notifications", label: "Notifications" },
   { id: "receipts", label: "Tickets & Reçus" },
   { id: "integrations", label: "Intégrations" },
+  { id: "maga", label: "Assistant Maga" },
   { id: "public-app", label: "App publique" },
   { id: "security", label: "Sécurité" },
 ];

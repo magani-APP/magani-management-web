@@ -449,7 +449,7 @@ export function PosView() {
         </div>
 
         {/* BAS DU PANIER */}
-        <div className="flex-shrink-0 border-t border-[#F0F5F2] pb-14">
+        <div className="flex-shrink-0 border-t border-[#F0F5F2]">
           {/* REMISE + TOTAUX — masqué tant que le panier est vide */}
           {cart.length > 0 && (
           <div className="px-4 pt-3 space-y-3">

@@ -10,6 +10,7 @@ import { PaymentsSettingsCard } from "@/features/settings/components/PaymentsSet
 import { StockSettingsCard } from "@/features/settings/components/StockSettingsCard";
 import { SecuritySettingsCard } from "@/features/settings/components/SecuritySettingsCard";
 import { ComingSoonCard } from "@/features/settings/components/ComingSoonCard";
+import { MagaSettingsCard } from "@/features/settings/components/MagaSettingsCard";
 import { SettingsPlaceholder } from "@/features/settings/components/SettingsPlaceholder";
 import { SETTINGS_TABS } from "@/constants/settings.constants";
 
@@ -79,6 +80,10 @@ function SettingsContent() {
           description="Cette section est en cours de configuration et sera disponible dans la prochaine mise à jour."
         />
       );
+    }
+
+    if (activeTab === "maga") {
+      return <MagaSettingsCard key={activeTab} />;
     }
 
     if (activeTab === "public-app") {
