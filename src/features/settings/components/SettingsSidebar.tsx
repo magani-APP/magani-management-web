@@ -10,6 +10,7 @@ import {
   Bell,
   Printer,
   Zap,
+  Bot,
   Globe,
   Shield,
 } from "lucide-react";
@@ -26,6 +27,7 @@ const TAB_ICONS: Record<SettingsTabId, React.ReactNode> = {
   notifications: <Bell size={13} />,
   receipts: <Printer size={13} />,
   integrations: <Zap size={13} />,
+  maga: <Bot size={13} />,
   "public-app": <Globe size={13} />,
   security: <Shield size={13} />,
 };

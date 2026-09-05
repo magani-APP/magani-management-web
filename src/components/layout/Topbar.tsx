@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -34,17 +35,82 @@ export function Topbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
-  const popoverRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // close the popover when we click outside
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Le portail (createPortal) a besoin du DOM du navigateur : on ne l'active
+  // qu'une fois le composant monté côté client, pour éviter tout souci
+  // d'hydratation SSR.
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Calcule la position du menu par rapport au bouton déclencheur. Le menu
+  // est rendu dans un portail (document.body) plutôt qu'à l'intérieur du
+  // <header>, car le <header> applique un backdrop-blur : combiné à
+  // l'animation (transform/scale) du menu, ce filtre provoque un bug de
+  // rendu bien connu de Chromium qui fait disparaître le texte de certaines
+  // lignes du calendrier (typiquement la ligne du mois sélectionné, celle
+  // qui se re-peint le plus souvent). Sortir le menu du <header> via un
+  // portail élimine ce conflit filter + transform à la racine.
+  const updateCoords = useCallback(() => {
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setCoords({ top: rect.bottom + 8, left: rect.left });
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    updateCoords();
+
+    function handleReposition() {
+      updateCoords();
+    }
+    // Le scroll peut se produire dans la zone de contenu (pas la fenêtre) :
+    // on ferme simplement le menu plutôt que de risquer un mauvais calage.
+    function handleScroll() {
+      setIsOpen(false);
+    }
+
+    window.addEventListener("resize", handleReposition);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      window.removeEventListener("resize", handleReposition);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [isOpen, updateCoords]);
+
+  // Ferme le popover au clic en dehors (bouton déclencheur ET menu portalé).
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        triggerRef.current &&
+        !triggerRef.current.contains(target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target)
+      ) {
         setIsOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Ferme le popover si on change de page ou si on appuie sur Échap.
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsOpen(false);
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
   const handleSelectMonth = (monthIndex: number) => {
@@ -53,6 +119,71 @@ export function Topbar() {
   };
 
   const formattedLabel = `${MONTHS_FR[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+
+  // On découpe les mois en lignes explicites de 3 plutôt que de compter sur
+  // le dimensionnement implicite d'une grille CSS : ça évite tout calcul de
+  // hauteur ambigu et garantit que les 12 mois s'affichent toujours.
+  const MONTH_ROWS: { month: string; index: number }[][] = [];
+  for (let i = 0; i < MONTHS_FR.length; i += 3) {
+    MONTH_ROWS.push(
+      MONTHS_FR.slice(i, i + 3).map((month, offset) => ({ month, index: i + offset }))
+    );
+  }
+
+  const dropdown =
+    isOpen && coords ? (
+      <div
+        ref={dropdownRef}
+        style={{ position: "fixed", top: coords.top, left: coords.left }}
+        className="w-64 p-3 bg-white border border-border-main rounded-2xl shadow-xl z-[1000]"
+      >
+        {/* Header Navigation Année */}
+        <div className="flex items-center justify-between mb-3 px-1">
+          <button
+            onClick={() => setViewYear((prev) => prev - 1)}
+            className="p-1 rounded-lg hover:bg-surface-muted text-text-secondary transition-colors"
+            type="button"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span className="text-[13px] font-bold text-text-main">{viewYear}</span>
+          <button
+            onClick={() => setViewYear((prev) => prev + 1)}
+            className="p-1 rounded-lg hover:bg-surface-muted text-text-secondary transition-colors"
+            type="button"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+
+        {/* Grille des mois — construite ligne par ligne */}
+        <div className="flex flex-col gap-1.5">
+          {MONTH_ROWS.map((row, rowIndex) => (
+            <div key={rowIndex} className="grid grid-cols-3 gap-1.5">
+              {row.map(({ month, index }) => {
+                const isSelected =
+                  selectedDate.getMonth() === index && selectedDate.getFullYear() === viewYear;
+
+                return (
+                  <button
+                    key={month}
+                    onClick={() => handleSelectMonth(index)}
+                    type="button"
+                    className={`py-2 text-[11px] font-medium rounded-xl transition-colors ${
+                      isSelected
+                        ? "bg-brand-primary text-white shadow-sm font-semibold"
+                        : "text-text-secondary hover:bg-surface-muted hover:text-text-main"
+                    }`}
+                  >
+                    {month.slice(0, 4)}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : null;
 
   return (
     <header className="sticky top-0 z-10 h-[57px] flex items-center px-6 bg-[#F5F7F5]/88 backdrop-blur-[20px] saturate-160 border-b border-brand-primary/10">
@@ -76,68 +207,22 @@ export function Topbar() {
       {/* Right Actions */}
       <div className="flex items-center gap-4 ml-6">
         {/* Period Selector (Popover) */}
-        <div className="relative" ref={popoverRef}>
+        <div className="relative" ref={triggerRef}>
           <button
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => setIsOpen((prev) => !prev)}
             className="flex items-center gap-2 px-3 py-1.5 rounded-4xl bg-white hover:shadow-sm transition-all text-text-secondary text-[12px] font-medium border border-border-main cursor-pointer select-none"
           >
             <CalendarIcon size={12} className="text-brand-primary" />
             <span>{formattedLabel}</span>
             <ChevronDown
               size={14}
-              className={`text-text-placeholder transition-transform duration-200 ${isOpen ? "rotate-180" : ""
-                }`}
+              className={`text-text-placeholder transition-transform duration-200 ${
+                isOpen ? "rotate-180" : ""
+              }`}
             />
           </button>
 
-          {/* Calendrier / Sélecteur de mois */}
-          {isOpen && (
-            <div className="absolute top-full left-0 mt-2 w-64 p-3 bg-white border border-border-main rounded-2xl shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
-              {/* Header Navigation Année */}
-              <div className="flex items-center justify-between mb-3 px-1">
-                <button
-                  onClick={() => setViewYear((prev) => prev - 1)}
-                  className="p-1 rounded-lg hover:bg-surface-muted text-text-secondary transition-colors"
-                  type="button"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <span className="text-[13px] font-bold text-text-main">
-                  {viewYear}
-                </span>
-                <button
-                  onClick={() => setViewYear((prev) => prev + 1)}
-                  className="p-1 rounded-lg hover:bg-surface-muted text-text-secondary transition-colors"
-                  type="button"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-
-              {/* Grille des mois */}
-              <div className="grid grid-cols-3 gap-1.5">
-                {MONTHS_FR.map((month, index) => {
-                  const isSelected =
-                    selectedDate.getMonth() === index &&
-                    selectedDate.getFullYear() === viewYear;
-
-                  return (
-                    <button
-                      key={month}
-                      onClick={() => handleSelectMonth(index)}
-                      type="button"
-                      className={`py-2 text-[11px] font-medium rounded-xl transition-all ${isSelected
-                        ? "bg-brand-primary text-white shadow-sm font-semibold"
-                        : "text-text-secondary hover:bg-surface-muted hover:text-text-main"
-                        }`}
-                    >
-                      {month.slice(0, 4)}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          {isMounted && dropdown ? createPortal(dropdown, document.body) : null}
         </div>
 
         {/* Notifications */}
