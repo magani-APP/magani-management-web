@@ -26,10 +26,11 @@ export function AuthTopbar({ panelKey, mobileImage }: AuthTopbarProps) {
 
       {/* Visuel mobile uniquement, remplace le panneau latéral sur petit écran */}
       <div className="auth-mobile-visual" aria-hidden="true">
-        <Image key={panelKey} src={mobileImage} alt="" fill style={{ objectFit: "cover" }} />
+        <div className="auth-mobile-visual-frame">
+          <Image key={panelKey} src={mobileImage} alt="" fill style={{ objectFit: "cover" }} />
+        </div>
         <span>
           <Sparkles strokeWidth={2} />
-          Magani
         </span>
       </div>
     </>

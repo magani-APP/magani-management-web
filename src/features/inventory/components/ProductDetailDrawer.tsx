@@ -57,10 +57,16 @@ export function ProductDetailDrawer({
   }, [product.id]);
 
   return (
-    <aside
-      className="w-[360px] flex-shrink-0 bg-white rounded-2xl border overflow-y-auto no-scrollbar flex flex-col"
-      style={{ borderColor: TOKENS.borderCard }}
-    >
+    <>
+      {/* Fond assombri — mobile uniquement, la fiche devient une feuille coulissante */}
+      <div
+        className="lg:hidden fixed inset-0 z-30 bg-black/30 backdrop-blur-[1px]"
+        onClick={onClose}
+      />
+      <aside
+        className="fixed inset-x-0 bottom-0 z-40 max-h-[88vh] rounded-t-3xl border shadow-[0_-8px_32px_rgba(0,0,0,0.12)] lg:static lg:z-auto lg:inset-auto lg:max-h-none lg:w-[360px] lg:flex-shrink-0 lg:rounded-2xl lg:shadow-none overflow-y-auto no-scrollbar flex flex-col bg-white"
+        style={{ borderColor: TOKENS.borderCard }}
+      >
       {/* EN-TÊTE */}
       <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b" style={{ borderColor: TOKENS.divider }}>
         <div className="flex items-center gap-3 min-w-0">
@@ -242,5 +248,6 @@ export function ProductDetailDrawer({
         </div>
       </div>
     </aside>
+    </>
   );
 }
