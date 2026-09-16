@@ -23,7 +23,7 @@ const TRUST_STATS: TrustStat[] = [
 
 export function AuthVisualPanel({ panelKey, image, chapter, headline, description, floatCards }: AuthVisualPanelProps) {
   return (
-    <aside className="auth-visual-panel" aria-label="PharmaOS simplifie le quotidien de votre pharmacie">
+    <aside className="auth-visual-panel h-full sticky top-0" aria-label="PharmaOS simplifie le quotidien de votre pharmacie">
       <Image
         key={panelKey}
         src={image}
