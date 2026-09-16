@@ -24,7 +24,7 @@ import { useInventoryCatalog } from '../../../hooks/CaissePOS/usePosCatalog';
 import { usePosCart } from '../../../hooks/CaissePOS/usePosCart';
 
 export function PosView() {
-  const { products } = useProducts();
+  const { products, refetch } = useProducts();
 
   const {
     searchQuery,
@@ -48,6 +48,8 @@ export function PosView() {
     subtotal,
     discountAmount,
     finalTotal,
+    isCheckingOut,
+    checkoutError,
     handleAddToCart,
     handleUpdateQuantity,
     handleRemoveCartItem,
@@ -59,7 +61,7 @@ export function PosView() {
     handleCancelCheckout,
     handleDownloadPDF,
     closeSuccessModal,
-  } = usePosCart(products);
+  } = usePosCart(products, refetch);
 
   // --- RACCOURCIS ---
   useEffect(() => {
@@ -76,38 +78,12 @@ export function PosView() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showCheckoutSuccess, handleCancelCheckout, searchInputRef]);
 
-  // --- BLOCAGE DU SCROLL DE LA PAGE (html/body) ---
-  // On verrouille le scroll global le temps que ce composant soit monté,
-  // sans toucher aux zones internes qui ont leur propre overflow-y-auto.
-  useEffect(() => {
-    const htmlEl = document.documentElement;
-    const bodyEl = document.body;
-
-    const prevHtmlOverflow = htmlEl.style.overflow;
-    const prevBodyOverflow = bodyEl.style.overflow;
-    const prevHtmlHeight = htmlEl.style.height;
-    const prevBodyHeight = bodyEl.style.height;
-    const prevBodyOverscroll = bodyEl.style.overscrollBehavior;
-
-    htmlEl.style.overflow = 'hidden';
-    bodyEl.style.overflow = 'hidden';
-    htmlEl.style.height = '100%';
-    bodyEl.style.height = '100%';
-    bodyEl.style.overscrollBehavior = 'none';
-
-    return () => {
-      htmlEl.style.overflow = prevHtmlOverflow;
-      bodyEl.style.overflow = prevBodyOverflow;
-      htmlEl.style.height = prevHtmlHeight;
-      bodyEl.style.height = prevBodyHeight;
-      bodyEl.style.overscrollBehavior = prevBodyOverscroll;
-    };
-  }, []);
-
-  // --- VENTES EN ATTENTE : molette verticale -> scroll horizontal ---
   const heldSalesScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  // Sur mobile, le panier est une feuille (bottom sheet) masquée par défaut ;
+  // sur desktop (lg+) il reste toujours visible en colonne fixe (cf. CSS ci-dessous).
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     const el = heldSalesScrollRef.current;
@@ -119,7 +95,7 @@ export function PosView() {
     };
 
     const handleWheel = (e: WheelEvent) => {
-      if (el.scrollWidth <= el.clientWidth) return; // rien à scroller
+      if (el.scrollWidth <= el.clientWidth) return;
       if (e.deltaY === 0) return;
       el.scrollLeft += e.deltaY;
       e.preventDefault();
@@ -139,9 +115,8 @@ export function PosView() {
 
   return (
     <div
-      className="flex w-full text-[#0F1A15] overflow-hidden min-h-0"
+      className="flex w-full h-full min-h-0 text-[#0F1A15] overflow-hidden"
       style={{
-        height: '100dvh',
         backgroundColor: TOKENS.bg,
         fontFamily:
           "'Geist', system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
@@ -157,9 +132,7 @@ export function PosView() {
         * { box-sizing: border-box; }
 
         html, body {
-          overflow: hidden;
           overscroll-behavior: none;
-          height: 100%;
         }
 
         .font-tabular { font-family: 'Geist Mono', ui-monospace, monospace; font-feature-settings: "tnum" 1; }
@@ -176,7 +149,7 @@ export function PosView() {
           background-color: ${TOKENS.warning};
         }
         .mobile-sheet-close { display: none; }
-        @media (max-width: 768px) {
+        @media (max-width: 1023px) {
           .mobile-sheet-close {
             display: flex;
             align-items: center;
@@ -190,7 +163,7 @@ export function PosView() {
       `}</style>
 
       {/* SECTION GAUCHE : CATÉGORIES, RECHERCHE & PRODUITS */}
-      <div className="pos-catalog flex-1 flex flex-col min-w-0 overflow-hidden p-5 pr-3 gap-3">
+      <div className="pos-catalog flex-1 flex flex-col min-w-0 overflow-hidden p-4 lg:p-5 lg:pr-3 gap-3">
         {/* RECHERCHE — Input POS (large) */}
         <div className="relative flex-shrink-0">
           <ScanLine
@@ -253,7 +226,7 @@ export function PosView() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-3 pb-12">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pb-24 lg:pb-12">
               {filteredProducts.map((product) => {
                 const cartItem = cart.find((i) => i.product.id === product.id);
                 const quantityInCart = cartItem ? cartItem.quantity : 0;
@@ -321,8 +294,38 @@ export function PosView() {
         </div>
       </div>
 
-      {/* SECTION DROITE : PANIER */}
-      <div className="pos-cart w-[340px] flex-shrink-0 flex flex-col bg-white border-l border-[#E8EDEA] overflow-hidden min-h-0">
+      {/* Trigger flottant "Panier" — mobile uniquement, feuille fermée */}
+      {!isCartOpen && (
+        <button
+          type="button"
+          onClick={() => setIsCartOpen(true)}
+          className="lg:hidden fixed bottom-[92px] right-4 z-30 flex items-center gap-2 pl-4 pr-4 py-3 rounded-full text-white text-xs font-bold shadow-button-primary active:scale-95 transition-transform"
+          style={{ background: 'linear-gradient(135deg, #0B8F68 0%, #07634B 100%)' }}
+        >
+          <ShoppingCart className="w-4 h-4" />
+          Panier
+          {totalItemsCount > 0 && (
+            <span className="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center text-[10px]">
+              {totalItemsCount}
+            </span>
+          )}
+        </button>
+      )}
+
+      {/* Fond assombri derrière le panier — mobile uniquement, s'arrête au-dessus de la tab bar */}
+      {isCartOpen && (
+        <div
+          className="lg:hidden fixed inset-x-0 top-0 bottom-[76px] z-30 bg-black/30 backdrop-blur-[1px]"
+          onClick={() => setIsCartOpen(false)}
+        />
+      )}
+
+      {/* SECTION DROITE : PANIER — tiroir plein écran (depuis la droite) sur mobile, colonne fixe dès lg */}
+      <div
+        className={`pos-cart fixed top-0 right-0 bottom-[76px] z-40 w-[72%] max-w-[380px] border-l shadow-[-8px_0_32px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out lg:transition-none lg:static lg:z-auto lg:top-auto lg:right-auto lg:bottom-auto lg:w-[340px] lg:max-w-none lg:flex-shrink-0 lg:shadow-none lg:translate-x-0 flex flex-col bg-white border-[#E8EDEA] overflow-hidden min-h-0 ${
+          isCartOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
         {/* EN-TÊTE PANIER — toujours visible et statique (non scrollable) */}
         <div className="px-5 pt-4 pb-3 border-b border-[#F0F5F2] flex-shrink-0">
           <div className="flex items-center justify-between gap-2 min-w-0">
@@ -394,7 +397,12 @@ export function PosView() {
                 </div>
               )}
 
-              <button className="mobile-sheet-close flex-shrink-0" aria-label="Fermer le panier">
+              <button
+                type="button"
+                onClick={() => setIsCartOpen(false)}
+                className="mobile-sheet-close flex-shrink-0"
+                aria-label="Fermer le panier"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -479,7 +487,7 @@ export function PosView() {
         </div>
 
         {/* BAS DU PANIER */}
-        <div className="flex-shrink-0 border-t border-[#F0F5F2] pb-14">
+        <div className="flex-shrink-0 border-t border-[#F0F5F2]">
           {/* REMISE + TOTAUX — masqué tant que le panier est vide */}
           {cart.length > 0 && (
           <div className="px-4 pt-3 space-y-3">
@@ -578,8 +586,13 @@ export function PosView() {
 
           {/* BOUTON ENCAISSER */}
           <div className="px-4 pb-4">
+            {checkoutError && (
+              <p className="text-[11px] text-red-600 font-medium mb-2 text-center">
+                {checkoutError}
+              </p>
+            )}
             <button
-              disabled={cart.length === 0}
+              disabled={cart.length === 0 || isCheckingOut}
               onClick={handleCheckout}
               className="w-full py-4 rounded-2xl text-white font-bold text-sm tracking-tight transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
               style={{
@@ -587,7 +600,11 @@ export function PosView() {
                 boxShadow: '0 4px 20px rgba(11,143,104,0.40)',
               }}
             >
-              {cart.length > 0 ? `Encaisser · ${formatPrice(finalTotal)} FCFA` : 'Encaisser'}
+              {isCheckingOut
+                ? 'Encaissement…'
+                : cart.length > 0
+                ? `Encaisser · ${formatPrice(finalTotal)} FCFA`
+                : 'Encaisser'}
             </button>
 
             <div className="flex gap-3 justify-center mt-2.5">
@@ -598,13 +615,13 @@ export function PosView() {
               >
                 Mettre en attente
               </button>
-              <span className="text-[#E8EDEA]">·</span>
+              <span className="text-[10px] text-[#E8EDEA]">·</span>
               <button
                 disabled={cart.length === 0}
                 onClick={handleClearCart}
-                className="text-[10px] text-[#9AAEA3] hover:text-red-500 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                className="text-[10px] text-[#9AAEA3] hover:text-red-600 transition-colors font-medium disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Annuler la vente
+                Vider le panier
               </button>
             </div>
           </div>

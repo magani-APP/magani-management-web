@@ -1,4 +1,4 @@
-import { Pill, AlertTriangle, Info, CalendarCheck, CheckCircle2 } from 'lucide-react';
+import { Pill, AlertTriangle, Info, CalendarCheck, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Reservation, ReservationStatus } from '@/types/reservations.types';
 import { ReservationStepper } from './ReservationStepper';
@@ -6,6 +6,8 @@ import { ReservationStepper } from './ReservationStepper';
 interface ReservationDetailProps {
   reservation: Reservation | null;
   onUpdateStatus: (id: string, newStatus: ReservationStatus) => void;
+  /** Ferme la fiche plein écran sur mobile (revient à la liste). */
+  onClose?: () => void;
 }
 
 const formatFCFA = (value: number) => {
@@ -26,10 +28,12 @@ const STATUS_BADGE_STYLES: Record<ReservationStatus, string> = {
   Annulée: 'bg-rose-50 text-rose-600',
 };
 
-export function ReservationDetail({ reservation, onUpdateStatus }: ReservationDetailProps) {
+export function ReservationDetail({ reservation, onUpdateStatus, onClose }: ReservationDetailProps) {
   if (!reservation) {
+    // Sur mobile, tant qu'aucune réservation n'est sélectionnée, la liste
+    // occupe tout l'écran — cet état vide ne s'affiche qu'à partir de lg.
     return (
-      <div className="flex-1 flex flex-col items-center justify-center h-full gap-2 text-gray-400 bg-[#FAFAFA]">
+      <div className="hidden lg:flex flex-1 flex-col items-center justify-center h-full gap-2 text-gray-400 bg-[#FAFAFA]">
         <CalendarCheck size={32} strokeWidth={1.5} className="text-gray-300" />
         <p className="text-[13px] font-medium text-gray-400">Sélectionnez une réservation</p>
       </div>
@@ -110,8 +114,18 @@ export function ReservationDetail({ reservation, onUpdateStatus }: ReservationDe
   };
 
   return (
-    <div className="flex-1 bg-background-secondary overflow-y-auto no-scrollbar flex flex-col">
-      <div className="w-full max-w-[500px] py-4 px-5 mt-5 mx-5 flex flex-col gap-5">
+    <div className="fixed inset-0 z-40 lg:static lg:z-auto lg:flex-1 bg-background-secondary overflow-y-auto no-scrollbar flex flex-col">
+      {/* Bouton retour — mobile uniquement, la fiche est plein écran */}
+      <button
+        type="button"
+        onClick={onClose}
+        className="lg:hidden flex items-center gap-2 px-5 pt-4 pb-1 text-[12px] font-semibold text-gray-500"
+      >
+        <ArrowLeft size={16} />
+        Réservations
+      </button>
+
+      <div className="w-full max-w-[500px] py-4 px-5 mt-1 lg:mt-5 mx-5 flex flex-col gap-5">
         <div className="flex items-start justify-between mb-0.5">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">

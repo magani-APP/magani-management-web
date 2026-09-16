@@ -19,8 +19,9 @@ export function MarginsReport({ data }: MarginsReportProps) {
         </p>
       </div>
 
-      <div className="max-w-[710px] rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
-        <table className="w-full text-left border-collapse">
+      <div className="lg:max-w-[710px] rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
+        <div className="overflow-x-auto no-scrollbar">
+        <table className="w-full text-left border-collapse min-w-[560px]">
           <thead>
             <tr className="bg-surface-muted border-b border-border-divider">
               <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Produit</th>
@@ -60,6 +61,7 @@ export function MarginsReport({ data }: MarginsReportProps) {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

@@ -10,8 +10,10 @@ import {
 } from '@/types/pos.types';
 import { generateReceiptHtml } from '@/lib/pdf/generateReceiptHtml';
 import { downloadHtmlFile } from '@/lib/pdf/downloadHtmlFile';
+import { createSale } from '@/api/pos.api';
+import { ApiError } from '@/lib/api-client';
 
-export function usePosCart(products: Product[]) {
+export function usePosCart(products: Product[], onSaleCompleted?: () => void) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('espèces');
@@ -21,13 +23,15 @@ export function usePosCart(products: Product[]) {
   const [completedOrderDetails, setCompletedOrderDetails] =
     useState<CompletedOrder | null>(null);
 
-  // Sauvegarde pour restaurer le panier en cas d'annulation
+  // Nouveaux états liés à l'appel API
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
   const [lastCartBackup, setLastCartBackup] = useState<{
     items: CartItem[];
     discount: number;
   } | null>(null);
 
-  // --- CALCULS PANIER ---
   const totalItemsCount = useMemo(() => {
     return cart.reduce((acc, item) => acc + item.quantity, 0);
   }, [cart]);
@@ -48,7 +52,6 @@ export function usePosCart(products: Product[]) {
     return Math.max(0, subtotal - discountAmount);
   }, [subtotal, discountAmount]);
 
-  // --- ACTIONS PANIER ---
   const handleAddToCart = (product: Product) => {
     setCart((prev) => {
       const existingIndex = prev.findIndex((i) => i.product.id === product.id);
@@ -88,13 +91,9 @@ export function usePosCart(products: Product[]) {
     setDiscountPercent(0);
   };
 
-  // --- VENTES EN ATTENTE ---
   const handleHoldSale = () => {
     if (cart.length === 0) return;
 
-    // Le numéro de la nouvelle attente reprend le plus grand numéro déjà
-    // présent dans la file (et non le nombre d'éléments), afin de ne pas
-    // réutiliser un numéro déjà attribué après suppression d'une attente.
     const nextSlotNum =
       heldSales.reduce((max, h) => {
         const match = h.label.match(/#(\d+)/);
@@ -119,41 +118,62 @@ export function usePosCart(products: Product[]) {
 
     setCart(targetHold.items);
     setDiscountPercent(targetHold.discount);
-    // L'attente reste dans la file : elle n'est retirée que via
-    // handleDeleteHoldSale (bouton "X" dédié), pas au simple clic.
   };
 
   const handleDeleteHoldSale = (holdId: string) => {
     setHeldSales((prev) => prev.filter((h) => h.id !== holdId));
   };
 
-  // --- ENCAISSEMENT ---
-  const handleCheckout = () => {
-    if (cart.length === 0) return;
+  // --- ENCAISSEMENT : appel réel à POST /pharmacy/pos/sales ---
+  const handleCheckout = async () => {
+    if (cart.length === 0 || isCheckingOut) return;
 
     setLastCartBackup({
       items: [...cart],
       discount: discountPercent,
     });
 
-    const orderSummary: CompletedOrder = {
-      id: `CMD-${Math.floor(100000 + Math.random() * 900000)}`,
-      items: [...cart],
-      subtotal,
-      discountAmount,
-      discountPercent,
-      total: finalTotal,
-      itemsCount: totalItemsCount,
-      method: paymentMethod,
-      date: new Date(),
-    };
+    setCheckoutError(null);
+    setIsCheckingOut(true);
 
-    setCompletedOrderDetails(orderSummary);
-    setShowCheckoutSuccess(true);
-    handleClearCart();
+    try {
+      const sale = await createSale({
+        items: cart.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+          unitPriceXaf: item.product.price,
+        })),
+        method: paymentMethod,
+        amountXaf: finalTotal,
+        discountXaf: discountAmount,
+      });
+
+      const orderSummary: CompletedOrder = {
+        id: sale.receiptNumber,
+        items: [...cart],
+        subtotal,
+        discountAmount,
+        discountPercent,
+        total: finalTotal,
+        itemsCount: totalItemsCount,
+        method: paymentMethod,
+        date: new Date(sale.createdAt),
+      };
+
+      setCompletedOrderDetails(orderSummary);
+      setShowCheckoutSuccess(true);
+      handleClearCart();
+      // Le stock vient de changer côté serveur : on rafraîchit le catalogue.
+      onSaleCompleted?.();
+    } catch (err) {
+      setCheckoutError(
+        err instanceof ApiError ? err.message : "La vente n'a pas pu être enregistrée."
+      );
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
-  // --- ANNULATION ET RESTAURATION DU PANIER ---
   const handleCancelCheckout = () => {
     if (lastCartBackup) {
       setCart(lastCartBackup.items);
@@ -163,7 +183,6 @@ export function usePosCart(products: Product[]) {
     setCompletedOrderDetails(null);
   };
 
-  // --- TÉLÉCHARGEMENT AUTOMATIQUE DU REÇU PDF ---
   const handleDownloadPDF = () => {
     if (!completedOrderDetails) return;
 
@@ -189,6 +208,8 @@ export function usePosCart(products: Product[]) {
     subtotal,
     discountAmount,
     finalTotal,
+    isCheckingOut,
+    checkoutError,
     handleAddToCart,
     handleUpdateQuantity,
     handleRemoveCartItem,

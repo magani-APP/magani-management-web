@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense } from "react";
-import { Bell, Globe, Printer, Receipt, Zap } from "lucide-react";
 import { useSettings } from "@/hooks/settings/useSettings";
 import { SettingsLayout } from "@/features/settings/components/SettingsLayout";
 import { PharmacySettingsCard } from "@/features/settings/components/PharmacySettingsCard";
@@ -9,7 +8,12 @@ import { TeamSettingsCard } from "@/features/settings/components/TeamSettingsCar
 import { PaymentsSettingsCard } from "@/features/settings/components/PaymentsSettingsCard";
 import { StockSettingsCard } from "@/features/settings/components/StockSettingsCard";
 import { SecuritySettingsCard } from "@/features/settings/components/SecuritySettingsCard";
-import { ComingSoonCard } from "@/features/settings/components/ComingSoonCard";
+import { ReceiptsSettingsCard } from "@/features/settings/components/ReceiptsSettingsCard";
+import { NotificationsSettingsCard } from "@/features/settings/components/NotificationsSettingsCard";
+import { IntegrationsSettingsCard } from "@/features/settings/components/IntegrationsSettingsCard";
+import { PosSettingsCard } from "@/features/settings/components/PosSettingsCard";
+import { PublicAppSettingsCard } from "@/features/settings/components/PublicAppSettingsCard";
+import { MagaSettingsCard } from "@/features/settings/components/MagaSettingsCard";
 import { SettingsPlaceholder } from "@/features/settings/components/SettingsPlaceholder";
 import { SETTINGS_TABS } from "@/constants/settings.constants";
 
@@ -30,14 +34,7 @@ function SettingsContent() {
     }
 
     if (activeTab === "pos") {
-      return (
-        <ComingSoonCard
-          key={activeTab}
-          icon={<Receipt size={20} />}
-          title="Caisse"
-          description="Cette section est en cours de configuration et sera disponible dans la prochaine mise à jour."
-        />
-      );
+      return <PosSettingsCard key={activeTab} />;
     }
 
     if (activeTab === "payments") {
@@ -49,47 +46,23 @@ function SettingsContent() {
     }
 
     if (activeTab === "notifications") {
-      return (
-        <ComingSoonCard
-          key={activeTab}
-          icon={<Bell size={20} />}
-          title="Notifications"
-          description="Cette section est en cours de configuration et sera disponible dans la prochaine mise à jour."
-        />
-      );
+      return <NotificationsSettingsCard key={activeTab} />;
     }
 
     if (activeTab === "receipts") {
-      return (
-        <ComingSoonCard
-          key={activeTab}
-          icon={<Printer size={20} />}
-          title="Tickets & Reçus"
-          description="Cette section est en cours de configuration et sera disponible dans la prochaine mise à jour."
-        />
-      );
+      return <ReceiptsSettingsCard key={activeTab} />;
     }
 
     if (activeTab === "integrations") {
-      return (
-        <ComingSoonCard
-          key={activeTab}
-          icon={<Zap size={20} />}
-          title="Intégrations"
-          description="Cette section est en cours de configuration et sera disponible dans la prochaine mise à jour."
-        />
-      );
+      return <IntegrationsSettingsCard key={activeTab} />;
+    }
+
+    if (activeTab === "maga") {
+      return <MagaSettingsCard key={activeTab} />;
     }
 
     if (activeTab === "public-app") {
-      return (
-        <ComingSoonCard
-          key={activeTab}
-          icon={<Globe size={20} />}
-          title="App publique"
-          description="Cette section est en cours de configuration et sera disponible dans la prochaine mise à jour."
-        />
-      );
+      return <PublicAppSettingsCard key={activeTab} />;
     }
 
     if (activeTab === "security") {

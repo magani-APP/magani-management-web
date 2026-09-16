@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -14,8 +15,11 @@ import {
   Info,
   ChevronDown,
   HeartPulse,
+  LogOut,
 } from "lucide-react";
-import { User, Pharmacy } from "../../api/core.api";
+import type { User, Pharmacy } from "../../api/core.api";
+import { logout } from "@/api/auth.api";
+import { useMagaVisibility } from "@/hooks/settings/useMagaVisibility";
 
 interface SidebarProps {
   user: User | null;
@@ -49,9 +53,21 @@ const NAV_GROUPS = [
 
 export function Sidebar({ user, pharmacy }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { enabled: isMagaVisible } = useMagaVisibility();
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      router.replace("/login");
+    }
+  }
 
   return (
-    <aside className="fixed left-2 top-2 bottom-2 w-[228px] rounded-2xl bg-white/88 backdrop-blur-[24px] saturate-180 border border-border-glass shadow-sidebar flex flex-col z-20">
+    <aside className="hidden lg:flex fixed left-2 top-2 bottom-2 w-[228px] rounded-2xl bg-white/88 backdrop-blur-[24px] saturate-180 border border-border-glass shadow-sidebar flex-col z-20">
       {/* Brand Header */}
       <div className="flex items-center gap-3 p-5">
         <div className="w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center text-white shrink-0">
@@ -102,32 +118,44 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
         <div className="border-t border-border-main mx-4 mb-2"></div>
 
         <div className="p-3 pt-0">
-          <Link
-            href="/help"
-            className={`flex items-center gap-3 px-3 py-2 mb-1 rounded-xl text-xs font-medium transition-colors ${
-              pathname === "/help"
-                ? "bg-brand-primary text-white shadow-button"
-                : "text-text-secondary hover:bg-surface-muted hover:text-brand-primary"
-            }`}
-          >
-            <Bot size={16} />
-            Maga — officine
-          </Link>
-          <Link
-            href="/help"
-            className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl text-xs font-medium text-text-secondary hover:bg-surface-muted hover:text-brand-primary transition-colors"
+          {isMagaVisible && (
+            <Link
+              href="/help"
+              className={`flex items-center gap-3 px-3 py-2 mb-1 rounded-xl text-xs font-medium transition-colors ${
+                pathname === "/help"
+                  ? "bg-brand-primary text-white shadow-button"
+                  : "text-text-secondary hover:bg-surface-muted hover:text-brand-primary"
+              }`}
+            >
+              <Bot size={16} />
+              Maga — officine
+            </Link>
+          )}
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 px-3 py-2 mb-1 rounded-xl text-xs font-medium text-text-secondary hover:bg-surface-muted hover:text-brand-primary transition-colors cursor-pointer"
           >
             <Info size={16} />
             Aide & documentation
-          </Link>
+          </button>
 
-          <div className="flex items-center justify-between p-3 rounded-3xl hover:bg-surface-muted transition-colors cursor-pointer border border-transparent">
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="flex w-full items-center gap-3 px-3 py-2 mb-2 rounded-xl text-xs font-medium text-text-secondary hover:bg-[#FFF4F2] hover:text-[#883530] transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <LogOut size={16} />
+            {isLoggingOut ? "Déconnexion..." : "Se déconnecter"}
+          </button>
+
+          <div className="flex items-center justify-between p-3 rounded-3xl border border-transparent">
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center text-[11px] font-bold shrink-0">
                 {user?.initials || "..."}
               </div>
-              <div className="overflow-hidden">
-                <p className="text-text-primary text-[13px] font-bold leading-tight truncate group-hover:text-brand-primary transition-colors">
+              <div className="overflow-hidden text-left">
+                <p className="text-text-primary text-[13px] font-bold leading-tight truncate">
                   {user?.name || "Chargement..."}
                 </p>
                 <p className="text-text-placeholder text-[11px] font-medium leading-tight truncate">

@@ -7,6 +7,7 @@ export type SettingsTabId =
   | "notifications"
   | "receipts"
   | "integrations"
+  | "maga"
   | "public-app"
   | "security";
 

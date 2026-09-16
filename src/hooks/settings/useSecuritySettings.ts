@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { SecuritySettings } from "@/types/settings";
 import {
   disconnectAllSessions as disconnectAllSessionsApi,
@@ -9,6 +10,7 @@ import {
 } from "@/api/settings.api";
 
 export function useSecuritySettings() {
+  const router = useRouter();
   const [settings, setSettings] = useState<SecuritySettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
@@ -49,9 +51,7 @@ export function useSecuritySettings() {
     setIsDisconnecting(true);
     try {
       await disconnectAllSessionsApi();
-      setSettings((prev) =>
-        prev ? { ...prev, activeSessionsCount: 1, activeSessionsDevices: "Cet appareil" } : prev
-      );
+      router.push("/login");
     } finally {
       setIsDisconnecting(false);
     }
