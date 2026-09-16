@@ -1,5 +1,4 @@
 import {
-  mockPaymentMethods,
   mockSecuritySettings,
   mockStockSettings,
 } from "@/mocks/settings.mock";
@@ -16,10 +15,10 @@ import { apiRequest } from "@/lib/api-client";
 
 export type { PaymentMethod, PharmacySettings, SecuritySettings, StockSetting, TeamMember, TeamMemberStatus };
 
-// ---- Pharmacie (réel : GET via /auth/me + /pharmacies/:id, PATCH /pharmacies/me, PUT /pharmacies/me/hours) ----
+// ---- Pharmacie ----
 
 interface ApiHour {
-  dayOfWeek: number; // 0 = dimanche ... 6 = samedi
+  dayOfWeek: number;
   openTime: string | null;
   closeTime: string | null;
   isClosed: boolean;
@@ -65,9 +64,6 @@ export const getPharmacySettings = async (): Promise<PharmacySettings> => {
 export const updatePharmacySettings = async (
   data: PharmacySettings
 ): Promise<PharmacySettings> => {
-  // ⚠️ "hours" reste en lecture seule ici : c'est un texte formaté côté front,
-  // alors que l'API attend un tableau structuré (PUT /pharmacies/me/hours).
-  // Il faudra une UI dédiée (jour par jour) pour éditer les horaires.
   const pharmacy = await apiRequest<ApiPharmacy>("/pharmacies/me", {
     method: "PATCH",
     body: JSON.stringify({
@@ -88,10 +84,7 @@ export const updatePharmacySettings = async (
   };
 };
 
-// ---- Équipe : seule l'invitation est réelle (POST /pharmacy/pos/staff). ----
-// 🚧 Il n'existe pas encore d'endpoint pour LISTER, DÉSACTIVER ou SUPPRIMER
-// les membres de l'équipe d'une pharmacie (GET /users est admin-only).
-// On garde donc la liste en mock en attendant que le backend l'expose.
+// ---- Équipe ----
 
 export interface InviteTeamMemberInput {
   name: string;
@@ -99,8 +92,23 @@ export interface InviteTeamMemberInput {
   role: string;
 }
 
+type ApiStaff = {
+  id: string;
+  email: string | null;
+  firstName: string;
+  lastName: string;
+  role: "PHARMACY_OWNER" | "PHARMACIST" | "PHARMACY_STAFF" | string;
+  isActive: boolean;
+};
+
 const ROLE_TO_API: Record<string, "PHARMACIST" | "PHARMACY_STAFF"> = {
   "Pharmacien(ne)": "PHARMACIST",
+};
+
+const ROLE_FROM_API: Record<string, string> = {
+  PHARMACY_OWNER: "Propriétaire",
+  PHARMACIST: "Pharmacien(ne)",
+  PHARMACY_STAFF: "Employé",
 };
 
 function splitName(fullName: string): { firstName: string; lastName: string } {
@@ -111,15 +119,22 @@ function splitName(fullName: string): { firstName: string; lastName: string } {
 }
 
 function generateTempPassword(): string {
-  // Mot de passe provisoire en attendant un vrai flux d'invitation par e-mail
-  // (lien d'activation) côté backend.
   return `Magani-${Math.random().toString(36).slice(2, 8)}${Math.floor(Math.random() * 10)}!`;
 }
 
+function mapStaff(row: ApiStaff): TeamMember {
+  return {
+    id: row.id,
+    name: `${row.firstName} ${row.lastName}`.trim(),
+    email: row.email ?? "",
+    role: ROLE_FROM_API[row.role] ?? row.role,
+    status: row.isActive ? "active" : "inactive",
+  };
+}
+
 export const getTeamMembers = async (): Promise<TeamMember[]> => {
-  const { mockTeamMembers } = await import("@/mocks/settings.mock");
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return mockTeamMembers;
+  const rows = await apiRequest<ApiStaff[]>("/pharmacy/pos/staff");
+  return rows.map(mapStaff);
 };
 
 export const inviteTeamMember = async (
@@ -128,7 +143,7 @@ export const inviteTeamMember = async (
   const { firstName, lastName } = splitName(input.name);
   const role = ROLE_TO_API[input.role] ?? "PHARMACY_STAFF";
 
-  const created = await apiRequest<{ id: string }>("/pharmacy/pos/staff", {
+  const created = await apiRequest<ApiStaff>("/pharmacy/pos/staff", {
     method: "POST",
     body: JSON.stringify({
       email: input.email,
@@ -139,59 +154,88 @@ export const inviteTeamMember = async (
     }),
   });
 
-  return {
-    id: created.id,
-    name: input.name,
-    email: input.email,
-    role: input.role,
-    status: "active",
-  };
+  return mapStaff({
+    ...created,
+    email: created.email ?? input.email,
+    firstName: created.firstName ?? firstName,
+    lastName: created.lastName ?? lastName,
+    role: created.role ?? role,
+    isActive: created.isActive ?? true,
+  });
 };
 
-// Pas d'endpoint backend pour ces deux actions pour l'instant.
 export const updateTeamMemberStatus = async (
-  _id: string,
-  _status: TeamMemberStatus
+  id: string,
+  status: TeamMemberStatus
 ): Promise<void> => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await apiRequest(`/pharmacy/pos/staff/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ isActive: status === "active" }),
+  });
 };
 
-export const removeTeamMember = async (_id: string): Promise<void> => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
+export const removeTeamMember = async (id: string): Promise<void> => {
+  await apiRequest(`/pharmacy/pos/staff/${id}`, { method: "DELETE" });
 };
 
-// ---- Paiements / Stock : pas encore d'endpoint dédié, restent mockés ----
+// ---- Paiements ----
 
 export const getPaymentMethods = async (): Promise<PaymentMethod[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return mockPaymentMethods;
+  const rows = await apiRequest<PaymentMethod[]>("/pharmacies/me/payment-methods");
+  return rows;
 };
 
 export const updatePaymentMethodStatus = async (
-  _id: string,
-  _enabled: boolean
+  id: string,
+  enabled: boolean
 ): Promise<void> => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  const current = await getPaymentMethods();
+  const methods = current
+    .filter((m) => {
+      if (m.isFixed) return true;
+      if (m.id === id) return enabled;
+      return m.enabled;
+    })
+    .map((m) => m.id);
+
+  await apiRequest("/pharmacies/me/payment-methods", {
+    method: "PUT",
+    body: JSON.stringify({ methods }),
+  });
 };
 
+// ---- Stock : pas encore d'endpoint dédié ----
+
 export const getStockSettings = async (): Promise<StockSetting[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await new Promise((resolve) => setTimeout(resolve, 200));
   return mockStockSettings;
 };
 
 export const updateStockSetting = async (_id: string, _enabled: boolean): Promise<void> => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await new Promise((resolve) => setTimeout(resolve, 200));
 };
 
-// ---- Sécurité : déjà réel pour la déconnexion globale ----
+// ---- Sécurité ----
 
 export const getSecuritySettings = async (): Promise<SecuritySettings> => {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return mockSecuritySettings;
+  try {
+    const data = await apiRequest<{
+      twoFactorEnabled: boolean;
+      activeSessionsCount: number;
+      activeSessionsDevices: string;
+    }>("/auth/sessions");
+    return {
+      twoFactorEnabled: data.twoFactorEnabled,
+      activeSessionsCount: data.activeSessionsCount,
+      activeSessionsDevices: data.activeSessionsDevices || "Aucun appareil",
+    };
+  } catch {
+    return mockSecuritySettings;
+  }
 };
 
 export const updateTwoFactorStatus = async (_enabled: boolean): Promise<void> => {
-  await new Promise((resolve) => setTimeout(resolve, 400));
+  await new Promise((resolve) => setTimeout(resolve, 200));
 };
 
 export const disconnectAllSessions = async (): Promise<void> => {

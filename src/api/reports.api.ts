@@ -1,10 +1,7 @@
 import { listDetailedPosSales, DetailedSale } from "@/api/pos.api";
 import { getInventoryProducts } from "@/api/inventory.api";
-import {
-  mockMargins,
-  mockLosses,
-  mockEmployees,
-} from "@/mocks/reports.mock";
+import { mockEmployees } from "@/mocks/reports.mock";
+import { apiRequest } from "@/lib/api-client";
 import {
   MarginData,
   LossesData,
@@ -185,16 +182,29 @@ export const getStockValueReport = async (): Promise<StockValueData> => {
   return { totalValue, categories };
 };
 
-// ---- Marges, pertes, performance employés : pas de donnée de coût d'achat ----
-// exposée par le backend (PharmacyProduct n'a pas de champ "costPriceXaf",
-// et il n'existe pas d'endpoint de suivi des pertes). On garde ces 3 rapports
-// mockés jusqu'à ce que l'API expose ces données.
-export const getMarginsReport = async (): Promise<MarginData[]> => {
-  return mockMargins;
+// ---- Marges & pertes : endpoints dédiés ----
+export const getMarginsReport = async (days: 14 | 30 = 30): Promise<MarginData[]> => {
+  const to = new Date();
+  const from = new Date();
+  from.setDate(from.getDate() - (days - 1));
+  from.setHours(0, 0, 0, 0);
+  const qs = new URLSearchParams({
+    from: from.toISOString(),
+    to: to.toISOString(),
+  });
+  return apiRequest<MarginData[]>(`/pharmacy/reports/margins?${qs}`);
 };
 
-export const getLossesReport = async (): Promise<LossesData> => {
-  return mockLosses;
+export const getLossesReport = async (days: 365 = 365): Promise<LossesData> => {
+  const to = new Date();
+  const from = new Date();
+  from.setDate(from.getDate() - (days - 1));
+  from.setHours(0, 0, 0, 0);
+  const qs = new URLSearchParams({
+    from: from.toISOString(),
+    to: to.toISOString(),
+  });
+  return apiRequest<LossesData>(`/pharmacy/reports/losses?${qs}`);
 };
 
 export const getEmployeesReport = async (): Promise<EmployeePerformance[]> => {

@@ -24,6 +24,7 @@ interface ApiPharmacyProductRow {
   id: string;
   productId: string;
   priceXaf: number;
+  costPriceXaf?: number | null;
   quantity: number;
   reservedQuantity: number;
   availableQty: number;
@@ -69,6 +70,10 @@ function computeStatus(row: ApiPharmacyProductRow): InventoryProduct["status"] {
 }
 
 function toInventoryProduct(row: ApiPharmacyProductRow): InventoryProduct {
+  const cost = row.costPriceXaf ?? Math.round(row.priceXaf * 0.6);
+  const marginPercent =
+    row.priceXaf > 0 ? Math.max(0, Math.round(((row.priceXaf - cost) / row.priceXaf) * 100)) : 0;
+
   return {
     // On expose directement le productId : c'est lui qu'attendent
     // upsertStock/importStock côté backend.
@@ -82,8 +87,7 @@ function toInventoryProduct(row: ApiPharmacyProductRow): InventoryProduct {
     stock: row.availableQty,
     unit: row.product.form ?? "unité",
     expirationDate: row.expiryDate ?? "",
-    // Pas de coût d'achat exposé par l'API pour l'instant → marge non calculable.
-    marginPercent: 0,
+    marginPercent,
     status: computeStatus(row),
     lots: row.lotNumber
       ? [

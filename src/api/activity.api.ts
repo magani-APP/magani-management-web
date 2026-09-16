@@ -1,8 +1,6 @@
-import { mockActivityGroups } from "@/mocks/activity.mock";
 import { ActivityDayGroup } from "@/types/activity.types";
+import { apiRequest } from "@/lib/api-client";
 
 export const getActivityLog = async (): Promise<ActivityDayGroup[]> => {
-  // Simule la latence réseau, comme le reste des endpoints mockés du projet
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return mockActivityGroups;
+  return apiRequest<ActivityDayGroup[]>("/pharmacy/activity");
 };
