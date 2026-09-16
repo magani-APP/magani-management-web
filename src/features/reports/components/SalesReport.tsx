@@ -54,7 +54,7 @@ export function SalesReport({ data, timeFilter, onTimeFilterChange }: SalesRepor
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="p-5 rounded-2xl bg-white/88 border border-border-card hover:shadow-[0_8px_24px_rgba(11,143,104,0.05)] transition-all">
           <div className="text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] mb-2">CA TOTAL</div>
           <div className="text-[18px] font-bold text-brand-primary tracking-tight">{formatFCFA(data.totalRevenue)}</div>
@@ -113,7 +113,8 @@ export function SalesReport({ data, timeFilter, onTimeFilterChange }: SalesRepor
       </div>
 
       <div className="rounded-2xl border border-border-card bg-white/88 overflow-hidden">
-        <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto no-scrollbar">
+        <table className="w-full text-left border-collapse min-w-[560px]">
           <thead>
             <tr className="bg-surface-alt border-b border-border-divider">
               <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] w-1/4">Date</th>
@@ -143,6 +144,7 @@ export function SalesReport({ data, timeFilter, onTimeFilterChange }: SalesRepor
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

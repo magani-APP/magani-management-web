@@ -22,7 +22,7 @@ const getBadgeStyle = (type: LossType) => {
 
 export function LossesReport({ data }: LossesReportProps) {
   return (
-    <div className="max-w-[710px] flex flex-col gap-6">
+    <div className="lg:max-w-[710px] flex flex-col gap-6">
       <div>
         <h2 className="text-[16px] font-bold text-text-foreground">Pertes & destructions</h2>
         <p className="text-[12px] font-medium text-text-muted mt-1">
@@ -30,7 +30,7 @@ export function LossesReport({ data }: LossesReportProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="bg-white/88 p-5 rounded-2xl bg-surface-main border border-border-card hover:shadow-[0_8px_24px_rgba(11,143,104,0.05)] transition-all flex flex-col justify-center">
           <div className="text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] mb-2">VALEUR TOTALE DES PERTES</div>
           <div className="text-[22px] font-bold text-status-danger tracking-tight">{formatFCFA(data.totalLossValue)}</div>
@@ -46,7 +46,8 @@ export function LossesReport({ data }: LossesReportProps) {
       </div>
 
       <div className="rounded-2xl border border-border-card bg-surface-muted overflow-hidden shadow-sm">
-        <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto no-scrollbar">
+        <table className="w-full text-left border-collapse min-w-[620px]">
           <thead>
             <tr className="bg-surface-alt border-b border-border-divider">
               <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Produit</th>
@@ -78,6 +79,7 @@ export function LossesReport({ data }: LossesReportProps) {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

@@ -81,6 +81,9 @@ export function PosView() {
   const heldSalesScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  // Sur mobile, le panier est une feuille (bottom sheet) masquée par défaut ;
+  // sur desktop (lg+) il reste toujours visible en colonne fixe (cf. CSS ci-dessous).
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     const el = heldSalesScrollRef.current;
@@ -146,7 +149,7 @@ export function PosView() {
           background-color: ${TOKENS.warning};
         }
         .mobile-sheet-close { display: none; }
-        @media (max-width: 768px) {
+        @media (max-width: 1023px) {
           .mobile-sheet-close {
             display: flex;
             align-items: center;
@@ -160,7 +163,7 @@ export function PosView() {
       `}</style>
 
       {/* SECTION GAUCHE : CATÉGORIES, RECHERCHE & PRODUITS */}
-      <div className="pos-catalog flex-1 flex flex-col min-w-0 overflow-hidden p-5 pr-3 gap-3">
+      <div className="pos-catalog flex-1 flex flex-col min-w-0 overflow-hidden p-4 lg:p-5 lg:pr-3 gap-3">
         {/* RECHERCHE — Input POS (large) */}
         <div className="relative flex-shrink-0">
           <ScanLine
@@ -223,7 +226,7 @@ export function PosView() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-3 pb-12">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pb-24 lg:pb-12">
               {filteredProducts.map((product) => {
                 const cartItem = cart.find((i) => i.product.id === product.id);
                 const quantityInCart = cartItem ? cartItem.quantity : 0;
@@ -291,8 +294,38 @@ export function PosView() {
         </div>
       </div>
 
-      {/* SECTION DROITE : PANIER */}
-      <div className="pos-cart w-[340px] flex-shrink-0 flex flex-col bg-white border-l border-[#E8EDEA] overflow-hidden min-h-0">
+      {/* Trigger flottant "Panier" — mobile uniquement, feuille fermée */}
+      {!isCartOpen && (
+        <button
+          type="button"
+          onClick={() => setIsCartOpen(true)}
+          className="lg:hidden fixed bottom-[92px] right-4 z-30 flex items-center gap-2 pl-4 pr-4 py-3 rounded-full text-white text-xs font-bold shadow-button-primary active:scale-95 transition-transform"
+          style={{ background: 'linear-gradient(135deg, #0B8F68 0%, #07634B 100%)' }}
+        >
+          <ShoppingCart className="w-4 h-4" />
+          Panier
+          {totalItemsCount > 0 && (
+            <span className="w-5 h-5 rounded-full bg-white/25 flex items-center justify-center text-[10px]">
+              {totalItemsCount}
+            </span>
+          )}
+        </button>
+      )}
+
+      {/* Fond assombri derrière le panier — mobile uniquement, s'arrête au-dessus de la tab bar */}
+      {isCartOpen && (
+        <div
+          className="lg:hidden fixed inset-x-0 top-0 bottom-[76px] z-30 bg-black/30 backdrop-blur-[1px]"
+          onClick={() => setIsCartOpen(false)}
+        />
+      )}
+
+      {/* SECTION DROITE : PANIER — tiroir plein écran (depuis la droite) sur mobile, colonne fixe dès lg */}
+      <div
+        className={`pos-cart fixed top-0 right-0 bottom-[76px] z-40 w-[72%] max-w-[380px] border-l shadow-[-8px_0_32px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out lg:transition-none lg:static lg:z-auto lg:top-auto lg:right-auto lg:bottom-auto lg:w-[340px] lg:max-w-none lg:flex-shrink-0 lg:shadow-none lg:translate-x-0 flex flex-col bg-white border-[#E8EDEA] overflow-hidden min-h-0 ${
+          isCartOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
         {/* EN-TÊTE PANIER — toujours visible et statique (non scrollable) */}
         <div className="px-5 pt-4 pb-3 border-b border-[#F0F5F2] flex-shrink-0">
           <div className="flex items-center justify-between gap-2 min-w-0">
@@ -364,7 +397,12 @@ export function PosView() {
                 </div>
               )}
 
-              <button className="mobile-sheet-close flex-shrink-0" aria-label="Fermer le panier">
+              <button
+                type="button"
+                onClick={() => setIsCartOpen(false)}
+                className="mobile-sheet-close flex-shrink-0"
+                aria-label="Fermer le panier"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>

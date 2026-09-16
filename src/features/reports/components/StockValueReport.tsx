@@ -11,7 +11,7 @@ const formatFCFA = (value: number) => {
 
 export function StockValueReport({ data }: StockValueReportProps) {
   return (
-    <div className="max-w-[710px] flex flex-col gap-6">
+    <div className="lg:max-w-[710px] flex flex-col gap-6">
       <div>
         <h2 className="text-[16px] font-bold text-text-foreground">Valeur totale du stock</h2>
         <p className="text-[12px] font-medium text-text-muted mt-1">
@@ -30,7 +30,8 @@ export function StockValueReport({ data }: StockValueReportProps) {
       </div>
 
       <div className="rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
-        <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto no-scrollbar">
+        <table className="w-full text-left border-collapse min-w-[620px]">
           <thead>
             <tr className="bg-surface-muted border-b border-border-divider">
               <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Catégorie</th>
@@ -65,6 +66,7 @@ export function StockValueReport({ data }: StockValueReportProps) {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

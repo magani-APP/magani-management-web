@@ -186,7 +186,7 @@ export function Topbar() {
     ) : null;
 
   return (
-    <header className="sticky top-0 z-10 h-[57px] flex items-center px-6 bg-[#F5F7F5]/88 backdrop-blur-[20px] saturate-160 border-b border-brand-primary/10">
+    <header className="hidden lg:flex sticky top-0 z-10 h-[57px] items-center px-6 bg-[#F5F7F5]/88 backdrop-blur-[20px] saturate-160 border-b border-brand-primary/10">
       {/* Global Search */}
       <div className="relative w-full max-w-[580px]">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

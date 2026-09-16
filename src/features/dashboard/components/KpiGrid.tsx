@@ -11,7 +11,7 @@ export function KpiGrid({ kpis }: KpiGridProps) {
   if (!kpis || Object.keys(kpis).length === 0) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6">
       <KpiCard
         data={kpis.revenue}
         Icon={TrendingUp}

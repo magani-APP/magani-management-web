@@ -47,6 +47,7 @@ export function ReservationsLayout() {
       <ReservationDetail
         reservation={selectedReservation}
         onUpdateStatus={updateReservationStatus}
+        onClose={() => setSelectedReservationId(null)}
       />
     </div>
   );

@@ -124,3 +124,44 @@ export const listPosSales = async (from?: string, to?: string): Promise<SaleResu
   const qs = params.toString();
   return apiRequest<SaleResult[]>(`/pharmacy/pos/sales${qs ? `?${qs}` : ""}`);
 };
+
+// ---- Détail complet d'une vente (items + paiements + caissier) ----
+// GET /pharmacy/pos/sales renvoie en réalité bien plus que SaleResult
+// (le backend inclut items.product, payments, cashier) : on expose ce
+// détail pour les rapports et les reçus, sans casser les appels existants
+// qui n'utilisaient que le sous-ensemble SaleResult.
+export interface DetailedSaleItem {
+  productId: string;
+  quantity: number;
+  unitPriceXaf: number;
+  product: { nameFr: string };
+}
+
+export interface DetailedSalePayment {
+  provider: ApiPaymentProvider;
+  amountXaf: number;
+  status: string;
+}
+
+export interface DetailedSale extends SaleResult {
+  discountXaf: number;
+  notes?: string | null;
+  items: DetailedSaleItem[];
+  payments: DetailedSalePayment[];
+  cashier?: { id: string; firstName: string; lastName: string } | null;
+}
+
+export const listDetailedPosSales = async (
+  from?: string,
+  to?: string,
+  tokens?: { accessToken?: string; refreshToken?: string },
+): Promise<DetailedSale[]> => {
+  const params = new URLSearchParams();
+  if (from) params.set("from", from);
+  if (to) params.set("to", to);
+  const qs = params.toString();
+  return apiRequest<DetailedSale[]>(`/pharmacy/pos/sales${qs ? `?${qs}` : ""}`, {
+    accessToken: tokens?.accessToken,
+    refreshToken: tokens?.refreshToken,
+  });
+};

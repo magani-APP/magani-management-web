@@ -33,8 +33,8 @@ export default async function DashboardPage() {
     ownerStatsData,
   ] = await Promise.all([
     getDashboardKpis(tokens),
-    getRevenueChartData(),
-    getPaymentDistribution(),
+    getRevenueChartData(tokens),
+    getPaymentDistribution(tokens),
     getActiveAlerts(tokens),
     getTopProducts(tokens),
     getOwnerStats(),

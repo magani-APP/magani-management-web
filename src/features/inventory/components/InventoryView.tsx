@@ -94,6 +94,10 @@ function getMarginBarColor(percent: number) {
 
 const TABLE_HEADERS = ['Produit', 'Catégorie', 'Prix vente', 'Stock', 'Expiration', 'Marge', 'Statut'];
 
+// Colonnes secondaires masquées sur mobile pour ne garder que l'essentiel
+// (Produit, Catégorie, Prix vente), comme sur la maquette responsive.
+const MOBILE_HIDDEN_COLUMNS = new Set(['Stock', 'Expiration', 'Marge', 'Statut']);
+
 export function InventoryView() {
   const {
     products,
@@ -188,9 +192,9 @@ export function InventoryView() {
         .no-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
 
-      <div className="flex-1 flex gap-5 items-start p-6 min-w-0">
+      <div className="flex-1 flex flex-col lg:flex-row gap-5 items-start p-4 lg:p-6 min-w-0">
         {/* COLONNE PRINCIPALE */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 w-full">
           {/* CARTES KPI */}
           <div className="px-0 pt-0 pb-3 flex-shrink-0">
             <div className="flex gap-3 overflow-x-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
@@ -225,20 +229,20 @@ export function InventoryView() {
           </div>
 
           {/* BARRE OUTILS */}
-          <div className="px-0 pb-3 flex items-center gap-2 flex-shrink-0">
+          <div className="px-0 pb-3 flex flex-col lg:flex-row lg:items-center gap-2 flex-shrink-0">
             {/* RECHERCHE */}
-            <div className="relative" style={{ width: 240 }}>
+            <div className="relative w-full lg:w-auto">
               <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9AAEA3]" />
               <input
                 placeholder="Rechercher…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 rounded-2xl text-xs font-medium outline-none bg-white border border-[#E8EDEA] placeholder:text-[#9AAEA3] text-[#0F1A15] focus:border-[#0B8F68]/40 transition-colors"
+                className="w-full lg:w-[240px] pl-8 pr-3 py-2 rounded-2xl text-xs font-medium outline-none bg-white border border-[#E8EDEA] placeholder:text-[#9AAEA3] text-[#0F1A15] focus:border-[#0B8F68]/40 transition-colors"
               />
             </div>
 
             {/* FILTRES */}
-            <div className="flex gap-0.5 p-1 bg-white rounded-2xl border border-[#E8EDEA]">
+            <div className="flex gap-0.5 p-1 bg-white rounded-2xl border border-[#E8EDEA] overflow-x-auto no-scrollbar w-full lg:w-auto" style={{ scrollbarWidth: 'none' }}>
               {INVENTORY_FILTERS.map((filter) => {
                 const isActive = activeFilter === filter;
                 return (
@@ -246,7 +250,7 @@ export function InventoryView() {
                     key={filter}
                     type="button"
                     onClick={() => setActiveFilter(filter)}
-                    className={`px-2.5 py-1.5 rounded-2xl text-[10px] font-bold transition-colors ${isActive ? 'text-white' : 'text-[#9AAEA3] hover:text-[#0F1A15]'
+                    className={`shrink-0 px-2.5 py-1.5 rounded-2xl text-[10px] font-bold transition-colors ${isActive ? 'text-white' : 'text-[#9AAEA3] hover:text-[#0F1A15]'
                       }`}
                     style={isActive ? { background: 'rgb(11, 143, 104)' } : undefined}
                   >
@@ -257,23 +261,23 @@ export function InventoryView() {
             </div>
 
             {/* ACTIONS */}
-            <div className="flex gap-2 ml-auto">
+            <div className="flex gap-2 lg:ml-auto overflow-x-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
               <button
                 type="button"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-2xl border border-[#E8EDEA] bg-white text-[10px] font-semibold text-[#6B7A6F] hover:text-[#0B8F68] hover:border-[#0B8F68]/30 transition-colors"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-2xl border border-[#E8EDEA] bg-white text-[10px] font-semibold text-[#6B7A6F] hover:text-[#0B8F68] hover:border-[#0B8F68]/30 transition-colors"
               >
                 <Upload size={11} /> Importer
               </button>
               <button
                 type="button"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-2xl border border-[#E8EDEA] bg-white text-[10px] font-semibold text-[#6B7A6F] hover:text-[#0B8F68] hover:border-[#0B8F68]/30 transition-colors"
+                className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-2xl border border-[#E8EDEA] bg-white text-[10px] font-semibold text-[#6B7A6F] hover:text-[#0B8F68] hover:border-[#0B8F68]/30 transition-colors"
               >
                 <Download size={11} /> Exporter
               </button>
               <button
                 type="button"
                 onClick={() => setIsAddOpen(true)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-white text-[10px] font-bold hover:opacity-90"
+                className="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-white text-[10px] font-bold hover:opacity-90"
                 style={{ background: 'rgb(11, 143, 104)' }}
               >
                 <Plus size={12} /> Ajouter un produit
@@ -282,7 +286,7 @@ export function InventoryView() {
           </div>
 
           {/* TABLEAU */}
-          <div className="products-table-scroll flex-1 overflow-y-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
+          <div className="products-table-scroll flex-1 overflow-x-auto lg:overflow-y-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
             <div className="bg-white rounded-2xl border border-[#E8EDEA] overflow-hidden">
               <table className="w-full">
                 <thead className="sticky top-0 z-10" style={{ background: 'rgb(245, 247, 245)' }}>
@@ -290,7 +294,9 @@ export function InventoryView() {
                     {TABLE_HEADERS.map((header) => (
                       <th
                         key={header}
-                        className="px-4 py-3 text-left text-[9px] font-bold text-[#9AAEA3] uppercase tracking-[0.08em] cursor-pointer hover:text-[#0B8F68] transition-colors select-none whitespace-nowrap"
+                        className={`px-4 py-3 text-left text-[9px] font-bold text-[#9AAEA3] uppercase tracking-[0.08em] cursor-pointer hover:text-[#0B8F68] transition-colors select-none whitespace-nowrap ${
+                          MOBILE_HIDDEN_COLUMNS.has(header) ? 'hidden lg:table-cell' : ''
+                        }`}
                       >
                         <div className="flex items-center gap-1">
                           {header}
@@ -350,17 +356,17 @@ export function InventoryView() {
                             {formatPrice(product.salePrice)} F
                           </td>
 
-                          <td className="px-4 py-3">
+                          <td className="hidden lg:table-cell px-4 py-3">
                             <span className={`text-[11px] font-bold font-mono ${getStockTextClass(product.status)}`}>
                               {product.stock} {product.unit}
                             </span>
                           </td>
 
-                          <td className="px-4 py-3 text-[10px] text-[#6B7A6F] font-mono whitespace-nowrap">
+                          <td className="hidden lg:table-cell px-4 py-3 text-[10px] text-[#6B7A6F] font-mono whitespace-nowrap">
                             {product.expirationDate ? formatDate(product.expirationDate) : '—'}
                           </td>
 
-                          <td className="px-4 py-3">
+                          <td className="hidden lg:table-cell px-4 py-3">
                             <div className="flex items-center gap-2">
                               <div className="w-12 h-1 rounded-full bg-[#E8EDEA] overflow-hidden">
                                 <div
@@ -377,7 +383,7 @@ export function InventoryView() {
                             </div>
                           </td>
 
-                          <td className="px-4 py-3">
+                          <td className="hidden lg:table-cell px-4 py-3">
                             <span
                               className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusStyle.badge}`}
                             >

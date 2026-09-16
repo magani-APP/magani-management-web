@@ -9,9 +9,9 @@ interface SettingsLayoutProps {
 
 export function SettingsLayout({ children, activeTab }: SettingsLayoutProps) {
   return (
-    <div className="flex h-full">
+    <div className="flex flex-col lg:flex-row h-full overflow-y-auto lg:overflow-hidden no-scrollbar">
       <SettingsSidebar activeTab={activeTab} />
-      <div className="flex-1 overflow-y-auto p-8" style={{ scrollbarWidth: "none" }}>
+      <div className="flex-1 lg:overflow-y-auto p-4 lg:p-8" style={{ scrollbarWidth: "none" }}>
         {children}
       </div>
     </div>

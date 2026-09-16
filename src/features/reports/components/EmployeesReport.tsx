@@ -10,7 +10,7 @@ const formatFCFA = (value: number) => {
 
 export function EmployeesReport({ data }: EmployeesReportProps) {
   return (
-    <div className="max-w-[710px] flex flex-col gap-6">
+    <div className="lg:max-w-[710px] flex flex-col gap-6">
       <div>
         <h2 className="text-[16px] font-bold text-text-foreground">Performances par employé</h2>
         <p className="text-[12px] font-medium text-text-muted mt-1">
@@ -19,7 +19,8 @@ export function EmployeesReport({ data }: EmployeesReportProps) {
       </div>
 
       <div className="rounded-2xl border border-border-card bg-surface-muted overflow-hidden shadow-sm">
-        <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto no-scrollbar">
+        <table className="w-full text-left border-collapse min-w-[620px]">
           <thead>
             <tr className="bg-surface-alt border-b border-border-divider">
               <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Employé</th>
@@ -64,6 +65,7 @@ export function EmployeesReport({ data }: EmployeesReportProps) {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
