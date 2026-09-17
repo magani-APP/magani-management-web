@@ -1,5 +1,6 @@
 import { apiRequest } from "@/lib/api-client";
 import { Reservation, ReservationStatus } from "@/types/reservations.types";
+import { mockReservations } from "@/mocks/reservations.mock";
 
 // ---- Shape brute renvoyée par GET /reservations/inbox et /reservations/:id ----
 interface ApiReservationItem {
@@ -74,8 +75,14 @@ function toReservation(row: ApiReservation): Reservation {
 
 class ReservationsApi {
   async getReservations(): Promise<Reservation[]> {
-    const rows = await apiRequest<ApiReservation[]>("/reservations/inbox");
-    return rows.map(toReservation);
+    try {
+      const rows = await apiRequest<ApiReservation[]>("/reservations/inbox");
+      return rows.map(toReservation);
+    } catch {
+      // Route indisponible côté backend : on retombe sur des réservations
+      // de démonstration pour ne pas bloquer l'affichage de la page.
+      return mockReservations;
+    }
   }
 
   async getReservationById(id: string): Promise<Reservation | undefined> {

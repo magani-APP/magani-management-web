@@ -6,20 +6,23 @@ import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { MagaChatPanel } from "./MagaChatPanel";
 import { useMagaChat } from "../hooks/useMagaChat";
+import { useMagaVisibility } from "@/hooks/settings/useMagaVisibility";
 
 const MagaRobot3D = dynamic(
   () => import("./MagaRobot3D").then((m) => m.MagaRobot3D),
   { ssr: false },
 );
 
-const HIDDEN_ON = ["/pos"];
+const HIDDEN_ON = ["/pos", "/aide"];
 const FULL_PAGE = ["/help"];
 
 export function MagaWidget() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const chat = useMagaChat();
+  const { enabled: isMagaVisible } = useMagaVisibility();
 
+  if (!isMagaVisible) return null;
   if (HIDDEN_ON.includes(pathname) || FULL_PAGE.includes(pathname)) return null;
 
   return (

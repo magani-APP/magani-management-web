@@ -131,13 +131,17 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
               Maga — officine
             </Link>
           )}
-          <button
-            type="button"
-            className="flex w-full items-center gap-3 px-3 py-2 mb-1 rounded-xl text-xs font-medium text-text-secondary hover:bg-surface-muted hover:text-brand-primary transition-colors cursor-pointer"
+          <Link
+            href="/aide"
+            className={`flex items-center gap-3 px-3 py-2 mb-1 rounded-xl text-xs font-medium transition-colors ${
+              pathname === "/aide"
+                ? "bg-brand-primary text-white shadow-button"
+                : "text-text-secondary hover:bg-surface-muted hover:text-brand-primary"
+            }`}
           >
             <Info size={16} />
-            Aide & documentation
-          </button>
+            Aide &amp; documentation
+          </Link>
 
           <button
             type="button"

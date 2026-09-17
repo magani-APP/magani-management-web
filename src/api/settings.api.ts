@@ -1,4 +1,7 @@
 import {
+  mockPharmacySettings,
+  mockTeamMembers,
+  mockPaymentMethods,
   mockSecuritySettings,
   mockStockSettings,
 } from "@/mocks/settings.mock";
@@ -46,19 +49,25 @@ function formatHoursSummary(hours: ApiHour[]): string {
 }
 
 export const getPharmacySettings = async (): Promise<PharmacySettings> => {
-  const profile = await getMe();
-  if (!profile.pharmacyId) {
-    throw new Error("Aucune pharmacie associée à ce compte.");
+  try {
+    const profile = await getMe();
+    if (!profile.pharmacyId) {
+      throw new Error("Aucune pharmacie associée à ce compte.");
+    }
+    const pharmacy = await apiRequest<ApiPharmacy>(`/pharmacies/${profile.pharmacyId}`);
+    return {
+      name: pharmacy.name,
+      licenseNumber: pharmacy.licenseNumber ?? "",
+      address: pharmacy.address,
+      phone: pharmacy.phone,
+      email: pharmacy.email ?? profile.email ?? "",
+      hours: formatHoursSummary(pharmacy.hours),
+    };
+  } catch {
+    // La route backend n'est pas (encore) disponible : on retombe sur des
+    // données de démonstration pour ne pas bloquer l'affichage de la page.
+    return mockPharmacySettings;
   }
-  const pharmacy = await apiRequest<ApiPharmacy>(`/pharmacies/${profile.pharmacyId}`);
-  return {
-    name: pharmacy.name,
-    licenseNumber: pharmacy.licenseNumber ?? "",
-    address: pharmacy.address,
-    phone: pharmacy.phone,
-    email: pharmacy.email ?? profile.email ?? "",
-    hours: formatHoursSummary(pharmacy.hours),
-  };
 };
 
 export const updatePharmacySettings = async (
@@ -133,8 +142,14 @@ function mapStaff(row: ApiStaff): TeamMember {
 }
 
 export const getTeamMembers = async (): Promise<TeamMember[]> => {
-  const rows = await apiRequest<ApiStaff[]>("/pharmacy/pos/staff");
-  return rows.map(mapStaff);
+  try {
+    const rows = await apiRequest<ApiStaff[]>("/pharmacy/pos/staff");
+    return rows.map(mapStaff);
+  } catch {
+    // La route backend n'est pas (encore) disponible : on retombe sur des
+    // données de démonstration pour ne pas bloquer l'affichage de la page.
+    return mockTeamMembers;
+  }
 };
 
 export const inviteTeamMember = async (
@@ -181,8 +196,14 @@ export const removeTeamMember = async (id: string): Promise<void> => {
 // ---- Paiements ----
 
 export const getPaymentMethods = async (): Promise<PaymentMethod[]> => {
-  const rows = await apiRequest<PaymentMethod[]>("/pharmacies/me/payment-methods");
-  return rows;
+  try {
+    const rows = await apiRequest<PaymentMethod[]>("/pharmacies/me/payment-methods");
+    return rows;
+  } catch {
+    // La route backend n'est pas (encore) disponible : on retombe sur des
+    // données de démonstration pour ne pas bloquer l'affichage de la page.
+    return mockPaymentMethods;
+  }
 };
 
 export const updatePaymentMethodStatus = async (

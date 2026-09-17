@@ -1,6 +1,7 @@
 import { TopProductData } from "@/types/reports";
-import { Pill, TrendingUp, TrendingDown } from "lucide-react";
+import { Pill, TrendingUp, TrendingDown, PackageSearch } from "lucide-react";
 import { cn } from "../../../lib/utils";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface TopProductsReportProps {
   data: TopProductData[];
@@ -20,7 +21,14 @@ export function TopProductsReport({ data }: TopProductsReportProps) {
         </p>
       </div>
 
-      <div className="lg:max-w-[710px] rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
+      <div className="lg:max-w-[710px] rounded-2xl border border-border-card bg-white overflow-hidden shadow-sm">
+        {data.length === 0 ? (
+          <EmptyState
+            icon={PackageSearch}
+            title="Aucune vente enregistrée"
+            description="Dès que des ventes seront réalisées ce mois-ci, votre classement des produits les plus vendus apparaîtra ici."
+          />
+        ) : (
         <div className="overflow-x-auto no-scrollbar">
         <table className="w-full text-left border-collapse min-w-[560px]">
           <thead>
@@ -63,6 +71,7 @@ export function TopProductsReport({ data }: TopProductsReportProps) {
           </tbody>
         </table>
         </div>
+        )}
       </div>
     </div>
   );

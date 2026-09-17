@@ -2,6 +2,8 @@
 
 import { PaymentsData } from "@/types/reports";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { CreditCard } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface PaymentsReportProps {
   data: PaymentsData;
@@ -23,6 +25,15 @@ export function PaymentsReport({ data }: PaymentsReportProps) {
       </div>
 
       {/* Grille principale */}
+      {data.modes.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-border-card shadow-sm">
+          <EmptyState
+            icon={CreditCard}
+            title="Aucun paiement enregistré"
+            description="Aucune donnée de paiement disponible"
+          />
+        </div>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-[290px_1fr] gap-4 items-stretch">
         {/* Carte Graphique Donut */}
         <div className="bg-white rounded-2xl border border-border-card p-4 shadow-sm flex items-center justify-center min-h-[280px]">
@@ -126,6 +137,7 @@ export function PaymentsReport({ data }: PaymentsReportProps) {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

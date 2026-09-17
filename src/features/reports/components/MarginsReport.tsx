@@ -1,5 +1,6 @@
 import { MarginData } from "@/types/reports";
-import { Pill } from "lucide-react";
+import { Pill, BarChart3 } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface MarginsReportProps {
   data: MarginData[];
@@ -19,7 +20,14 @@ export function MarginsReport({ data }: MarginsReportProps) {
         </p>
       </div>
 
-      <div className="lg:max-w-[710px] rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
+      <div className="lg:max-w-[710px] rounded-2xl border border-border-card bg-white overflow-hidden shadow-sm">
+        {data.length === 0 ? (
+          <EmptyState
+            icon={BarChart3}
+            title="Pas encore de marge à afficher"
+            description="Aucune donnée de marge disponible pour cette période."
+          />
+        ) : (
         <div className="overflow-x-auto no-scrollbar">
         <table className="w-full text-left border-collapse min-w-[560px]">
           <thead>
@@ -62,6 +70,7 @@ export function MarginsReport({ data }: MarginsReportProps) {
           </tbody>
         </table>
         </div>
+        )}
       </div>
     </div>
   );

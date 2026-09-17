@@ -22,6 +22,7 @@ import { formatPrice } from '../../../utils/formatPrice.util';
 import { useProducts } from '../../../hooks/ProduitsStock/useProducts';
 import { useInventoryCatalog } from '../../../hooks/CaissePOS/usePosCatalog';
 import { usePosCart } from '../../../hooks/CaissePOS/usePosCart';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 export function PosView() {
   const { products, refetch } = useProducts();
@@ -216,14 +217,24 @@ export function PosView() {
           style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
         >
           {filteredProducts.length === 0 ? (
-            <div
-              className="h-64 flex flex-col items-center justify-center"
-              style={{ color: TOKENS.hairline }}
-            >
-              <Search className="w-7 h-7 mb-2 stroke-1" />
-              <p className="text-sm font-bold" style={{ color: TOKENS.mutedText }}>
-                Aucun médicament trouvé
-              </p>
+            <div className="bg-white rounded-2xl border border-[#E8EDEA] flex items-center justify-center h-64">
+              <EmptyState
+                icon={Search}
+                title={
+                  searchQuery
+                    ? `Aucun médicament pour « ${searchQuery} »`
+                    : selectedCategory !== 'Tous'
+                      ? `Aucun médicament dans « ${selectedCategory} »`
+                      : 'Aucun médicament trouvé'
+                }
+                description={
+                  searchQuery
+                    ? "Vérifiez l'orthographe, le code-barres ou essayez un autre nom."
+                    : selectedCategory !== 'Tous'
+                      ? 'Essayez une autre catégorie ou revenez à « Tous ».'
+                      : "Ajoutez des produits à votre inventaire pour commencer à vendre."
+                }
+              />
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pb-24 lg:pb-12">

@@ -1,5 +1,6 @@
 import { listDetailedPosSales, DetailedSale } from "@/api/pos.api";
 import { PosSale, PosSalePaymentMethod } from "@/types/pos-sales.types";
+import { POS_SALES } from "@/mocks/pos-sales.mock";
 
 const PROVIDER_TO_METHOD: Record<string, PosSalePaymentMethod> = {
   CASH: "cash",
@@ -68,6 +69,12 @@ function toPosSale(sale: DetailedSale): PosSale {
 }
 
 export const getPosSales = async (): Promise<PosSale[]> => {
-  const sales = await listDetailedPosSales();
-  return sales.map(toPosSale);
+  try {
+    const sales = await listDetailedPosSales();
+    return sales.map(toPosSale);
+  } catch {
+    // Route indisponible côté backend : on retombe sur des ventes de
+    // démonstration pour ne pas bloquer l'affichage de la page.
+    return POS_SALES;
+  }
 };

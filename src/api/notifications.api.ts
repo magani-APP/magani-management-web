@@ -5,6 +5,7 @@ import {
   NotificationDateGroup,
   NotificationIconType,
 } from "@/types/notifications.types";
+import { NOTIFICATIONS } from "@/mocks/notifications.mock";
 
 // ---- Shape brute renvoyée par GET /notifications (backend: modules/notifications) ----
 // Le modèle Prisma `Notification` expose : id, userId, type, titleFr, titleEn,
@@ -143,13 +144,23 @@ function toAppNotification(row: ApiNotification): AppNotification {
 }
 
 export const getNotifications = async (): Promise<AppNotification[]> => {
-  const rows = await apiRequest<ApiNotification[]>("/notifications");
-  return rows.map(toAppNotification);
+  try {
+    const rows = await apiRequest<ApiNotification[]>("/notifications");
+    return rows.map(toAppNotification);
+  } catch {
+    // Route indisponible côté backend : on retombe sur des notifications de
+    // démonstration pour ne pas bloquer l'affichage de la page.
+    return NOTIFICATIONS;
+  }
 };
 
 export const getUnreadNotificationIds = async (): Promise<Set<string>> => {
-  const rows = await apiRequest<ApiNotification[]>("/notifications");
-  return new Set(rows.filter((r) => !r.readAt).map((r) => r.id));
+  try {
+    const rows = await apiRequest<ApiNotification[]>("/notifications");
+    return new Set(rows.filter((r) => !r.readAt).map((r) => r.id));
+  } catch {
+    return new Set();
+  }
 };
 
 export const markNotificationAsRead = async (id: string): Promise<void> => {

@@ -1,5 +1,7 @@
 import { LossesData, LossType } from "@/types/reports";
 import { cn } from "../../../lib/utils";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ShieldCheck } from "lucide-react";
 
 interface LossesReportProps {
   data: LossesData;
@@ -45,7 +47,14 @@ export function LossesReport({ data }: LossesReportProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border-card bg-surface-muted overflow-hidden shadow-sm">
+      <div className="rounded-2xl border border-border-card bg-white overflow-hidden shadow-sm">
+        {data.items.length === 0 ? (
+          <EmptyState
+            icon={ShieldCheck}
+            title="Aucune perte enregistrée"
+            description="Aucune perte ou destruction n’a été enregistrée pour cette période."
+          />
+        ) : (
         <div className="overflow-x-auto no-scrollbar">
         <table className="w-full text-left border-collapse min-w-[620px]">
           <thead>
@@ -80,6 +89,7 @@ export function LossesReport({ data }: LossesReportProps) {
           </tbody>
         </table>
         </div>
+        )}
       </div>
     </div>
   );

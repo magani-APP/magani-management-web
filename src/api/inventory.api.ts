@@ -1,5 +1,6 @@
 import { ApiError, apiRequest } from "@/lib/api-client";
 import { InventoryProduct, InventoryStats, MovementType } from "@/types/inventory.types";
+import { mockInventoryProducts, mockInventoryStats } from "@/mocks/inventory.mock";
 
 export type { InventoryProduct, InventoryStats };
 
@@ -110,36 +111,46 @@ function toInventoryProduct(row: ApiPharmacyProductRow): InventoryProduct {
 }
 
 export const getInventoryProducts = async (): Promise<InventoryProduct[]> => {
-  const rows = await apiRequest<ApiPharmacyProductRow[]>("/pharmacy/inventory");
-  return rows.map(toInventoryProduct);
+  try {
+    const rows = await apiRequest<ApiPharmacyProductRow[]>("/pharmacy/inventory");
+    return rows.map(toInventoryProduct);
+  } catch {
+    // Route indisponible côté backend : on retombe sur un stock de
+    // démonstration pour ne pas bloquer l'affichage de la page.
+    return mockInventoryProducts;
+  }
 };
 
 export const getInventoryStats = async (): Promise<InventoryStats> => {
-  const rows = await apiRequest<ApiPharmacyProductRow[]>("/pharmacy/inventory");
+  try {
+    const rows = await apiRequest<ApiPharmacyProductRow[]>("/pharmacy/inventory");
 
-  const activeProducts = rows.filter((r) => r.isAvailable).length;
-  const stockValue = rows.reduce((sum, r) => sum + r.priceXaf * r.availableQty, 0);
-  const criticalStock = rows.filter((r) => r.availableQty <= 0 || r.isLowStock).length;
-  const now = Date.now();
-  const expiringSoon = rows.filter(
-    (r) =>
-      r.expiryDate &&
-      new Date(r.expiryDate).getTime() > now &&
-      new Date(r.expiryDate).getTime() < now + 30 * 24 * 60 * 60 * 1000,
-  ).length;
+    const activeProducts = rows.filter((r) => r.isAvailable).length;
+    const stockValue = rows.reduce((sum, r) => sum + r.priceXaf * r.availableQty, 0);
+    const criticalStock = rows.filter((r) => r.availableQty <= 0 || r.isLowStock).length;
+    const now = Date.now();
+    const expiringSoon = rows.filter(
+      (r) =>
+        r.expiryDate &&
+        new Date(r.expiryDate).getTime() > now &&
+        new Date(r.expiryDate).getTime() < now + 30 * 24 * 60 * 60 * 1000,
+    ).length;
 
-  return {
-    activeProducts,
-    activeProductsTrend: 0, // 🚧 pas d'historique renvoyé par l'API
-    stockValue,
-    stockValueTrend: 0,
-    criticalStock,
-    criticalStockTrend: 0,
-    expiringSoon,
-    expiringSoonTrend: null,
-    averageMargin: 0, // 🚧 pas de coût d'achat exposé
-    averageMarginTrend: 0,
-  };
+    return {
+      activeProducts,
+      activeProductsTrend: 0, // 🚧 pas d'historique renvoyé par l'API
+      stockValue,
+      stockValueTrend: 0,
+      criticalStock,
+      criticalStockTrend: 0,
+      expiringSoon,
+      expiringSoonTrend: null,
+      averageMargin: 0, // 🚧 pas de coût d'achat exposé
+      averageMarginTrend: 0,
+    };
+  } catch {
+    return mockInventoryStats;
+  }
 };
 
 // ---- Nouveaux services prêts à l'emploi (pas encore branchés dans l'UI) ----
@@ -196,18 +207,25 @@ export interface ProductCategoryOption {
 }
 
 export const listProductCategories = async (): Promise<ProductCategoryOption[]> => {
-  const nodes = await apiRequest<ApiCategoryNode[]>("/products/categories");
-  const options: ProductCategoryOption[] = [];
+  try {
+    const nodes = await apiRequest<ApiCategoryNode[]>("/products/categories");
+    const options: ProductCategoryOption[] = [];
 
-  const walk = (items: ApiCategoryNode[]) => {
-    for (const item of items) {
-      options.push({ id: item.id, name: item.nameFr });
-      if (item.children?.length) walk(item.children);
-    }
-  };
+    const walk = (items: ApiCategoryNode[]) => {
+      for (const item of items) {
+        options.push({ id: item.id, name: item.nameFr });
+        if (item.children?.length) walk(item.children);
+      }
+    };
 
-  walk(nodes);
-  return options;
+    walk(nodes);
+    return options;
+  } catch {
+    // Route indisponible côté backend : on dérive une liste de catégories
+    // à partir du stock de démonstration.
+    const names = Array.from(new Set(mockInventoryProducts.map((p) => p.category)));
+    return names.map((name) => ({ id: name, name }));
+  }
 };
 
 interface CreatedCatalogProduct {
@@ -269,8 +287,14 @@ export const createInventoryProduct = async (
 };
 
 export const getInventoryProduct = async (productId: string): Promise<InventoryProduct> => {
-  const row = await apiRequest<ApiPharmacyProductRow>(`/pharmacy/inventory/${productId}`);
-  return toInventoryProduct(row);
+  try {
+    const row = await apiRequest<ApiPharmacyProductRow>(`/pharmacy/inventory/${productId}`);
+    return toInventoryProduct(row);
+  } catch (error) {
+    const fallback = mockInventoryProducts.find((p) => p.id === productId);
+    if (fallback) return fallback;
+    throw error;
+  }
 };
 
 export const updateInventoryProduct = async (
