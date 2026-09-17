@@ -1,5 +1,6 @@
 import { listDetailedPosSales, DetailedSale } from "@/api/pos.api";
 import { Receipt, ReceiptPaymentMethod } from "@/types/receipts.types";
+import { RECEIPTS } from "@/mocks/receipts.mock";
 
 const PROVIDER_TO_METHOD: Record<string, ReceiptPaymentMethod> = {
   CASH: "cash",
@@ -63,6 +64,12 @@ function toReceipt(sale: DetailedSale): Receipt {
 }
 
 export const getReceipts = async (): Promise<Receipt[]> => {
-  const sales = await listDetailedPosSales();
-  return sales.map(toReceipt);
+  try {
+    const sales = await listDetailedPosSales();
+    return sales.map(toReceipt);
+  } catch {
+    // Route indisponible côté backend : on retombe sur des reçus de
+    // démonstration pour ne pas bloquer l'affichage de la page.
+    return RECEIPTS;
+  }
 };

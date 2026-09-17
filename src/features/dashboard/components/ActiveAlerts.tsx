@@ -1,6 +1,7 @@
 import React from "react";
-import { AlertTriangle, Clock, Info } from "lucide-react";
+import { AlertTriangle, Clock, Info, ShieldCheck } from "lucide-react";
 import { AlertData } from "../../../mocks/dashboard.mock";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface ActiveAlertsProps {
   data: AlertData[];
@@ -48,6 +49,14 @@ export function ActiveAlerts({ data }: ActiveAlertsProps) {
         </div>
       </div>
 
+      {data.length === 0 ? (
+        <EmptyState
+          icon={ShieldCheck}
+          title="Aucune alerte active"
+          description="Tout est sous contrôle : stocks, paiements et opérations sont dans les clous."
+          className="py-6 flex-1"
+        />
+      ) : (
       <div className="flex flex-col gap-3 flex-1 overflow-y-auto no-scrollbar">
         {data.map((alert) => {
           const styles = getAlertStyles(alert.severity);
@@ -71,6 +80,7 @@ export function ActiveAlerts({ data }: ActiveAlertsProps) {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

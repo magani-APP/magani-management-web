@@ -2,6 +2,8 @@
 
 import { PaymentsData } from "@/types/reports";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { CreditCard } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface PaymentsReportProps {
   data: PaymentsData;
@@ -151,6 +153,7 @@ export function PaymentsReport({ data }: PaymentsReportProps) {
         </div>
 
       </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { TopProductData } from "@/types/reports";
 import { Pill, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { cn } from "../../../lib/utils";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface TopProductsReportProps {
   data: TopProductData[];
@@ -75,6 +76,7 @@ export function TopProductsReport({ data }: TopProductsReportProps) {
           </tbody>
         </table>
         </div>
+        )}
       </div>
     </div>
   );

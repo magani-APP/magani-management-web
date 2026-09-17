@@ -10,6 +10,7 @@ interface TeamMemberRowProps {
   member: TeamMember;
   isLast: boolean;
   isSecondToLast: boolean;
+  gridCols: string;
   onToggleStatus: (id: string) => void;
   onRemove: (id: string) => void;
 }
@@ -31,6 +32,7 @@ export function TeamMemberRow({
   member,
   isLast,
   isSecondToLast,
+  gridCols,
   onToggleStatus,
   onRemove,
 }: TeamMemberRowProps) {
@@ -77,36 +79,41 @@ export function TeamMemberRow({
   return (
     <div
       ref={rowRef}
-      className="flex items-center gap-4 px-5 py-4 hover:bg-[#F9FBFA] transition-colors"
+      className="grid items-center gap-4 px-6 py-4 hover:bg-[#F9FBFA] transition-colors"
+      style={{ gridTemplateColumns: gridCols }}
     >
-      {/* Avatar */}
-      <div
-        className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-        style={{
-          background: isActive
-            ? "linear-gradient(135deg, rgb(11, 143, 104), rgb(7, 99, 75))"
-            : "rgb(200, 213, 204)",
-        }}
-      >
-        {getInitials(member.name)}
-      </div>
-
       {/* Identité */}
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-bold text-[#0F1A15]">{member.name}</p>
-        <p className="text-[10px] text-[#9AAEA3] font-medium mt-0.5">{member.email}</p>
+      <div className="flex items-center gap-3 min-w-0">
+        <div
+          className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+          style={{
+            background: isActive
+              ? "linear-gradient(135deg, rgb(11, 143, 104), rgb(7, 99, 75))"
+              : "rgb(200, 213, 204)",
+          }}
+        >
+          {getInitials(member.name)}
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-bold text-[#0F1A15] truncate">{member.name}</p>
+          <p className="text-[10px] text-[#9AAEA3] font-medium mt-0.5 truncate">{member.email}</p>
+        </div>
       </div>
 
       {/* Rôle */}
-      <span className="text-[10px] font-semibold text-[#6B7A6F] bg-[#F5F7F5] px-2.5 py-1 rounded-2xl border border-[#E8EDEA]">
-        {member.role}
-      </span>
+      <div>
+        <span className="text-[10px] font-semibold text-[#6B7A6F] bg-[#F5F7F5] px-2.5 py-1 rounded-2xl border border-[#E8EDEA] whitespace-nowrap">
+          {member.role}
+        </span>
+      </div>
 
       {/* Statut */}
-      <StatusBadge active={isActive} />
+      <div>
+        <StatusBadge active={isActive} />
+      </div>
 
       {/* Actions */}
-      <div className="relative" ref={menuRef}>
+      <div className="relative flex justify-end" ref={menuRef}>
         <button
           type="button"
           onClick={() => setMenuOpen((prev) => !prev)}
@@ -114,7 +121,7 @@ export function TeamMemberRow({
           aria-label={`Actions pour ${member.name}`}
           aria-expanded={menuOpen}
         >
-          <MoreHorizontal size={14} />
+          <MoreHorizontal size={16} />
         </button>
 
         {menuOpen && (

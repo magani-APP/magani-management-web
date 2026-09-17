@@ -1,6 +1,7 @@
 import React from "react";
-import { Pill, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+import { Pill, TrendingUp, TrendingDown, ArrowRight, PackageSearch } from "lucide-react";
 import { TopProduct } from "../../../mocks/dashboard.mock";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface TopProductsProps {
   data: TopProduct[];
@@ -18,6 +19,14 @@ export function TopProducts({ data }: TopProductsProps) {
         </button>
       </div>
 
+      {data.length === 0 ? (
+        <EmptyState
+          icon={PackageSearch}
+          title="Aucune vente ce mois-ci"
+          description="Vos produits les plus vendus s'afficheront ici dès que vous aurez enregistré des ventes."
+          className="py-8"
+        />
+      ) : (
       <div className="flex flex-col gap-1">
         {data.map((product, index) => {
           const isUp = product.trend === "up";
@@ -62,6 +71,7 @@ export function TopProducts({ data }: TopProductsProps) {
           );
         })}
       </div>
+      )}
     </div>
   );
 }

@@ -1,11 +1,35 @@
 "use client";
 
-import { CheckCheck } from "lucide-react";
+import { CheckCheck, BellOff } from "lucide-react";
 import { TOKENS } from "@/constants/design-tokens.constants";
 import { NOTIFICATION_TABS } from "@/constants/notifications.constants";
 import { NotificationTabId } from "@/types/notifications.types";
 import { useNotifications } from "@/hooks/settings/useNotifications";
 import { NotificationRow } from "./NotificationRow";
+import { EmptyState } from "@/components/ui/EmptyState";
+
+const EMPTY_MESSAGES: Record<NotificationTabId, { title: string; description: string }> = {
+  all: {
+    title: "Aucune notification",
+    description: "Vous êtes à jour : rien à signaler pour le moment.",
+  },
+  stock: {
+    title: "Aucune alerte de stock",
+    description: "Vous serez prévenu ici en cas de rupture ou de stock bas.",
+  },
+  reservations: {
+    title: "Aucune notification de réservation",
+    description: "Les nouvelles réservations et leurs mises à jour apparaîtront ici.",
+  },
+  caisse: {
+    title: "Aucune notification de caisse",
+    description: "Les événements liés aux paiements et à la caisse s'afficheront ici.",
+  },
+  systeme: {
+    title: "Aucune notification système",
+    description: "Les mises à jour et informations techniques apparaîtront ici.",
+  },
+};
 
 export function NotificationsSettingsCard() {
   const { activeTab, setActiveTab, tabCounts, groups, markAllAsRead, markOneAsRead } = useNotifications();
@@ -61,10 +85,12 @@ export function NotificationsSettingsCard() {
       {/* LISTE GROUPÉE PAR DATE */}
       <div className="space-y-6">
         {groups.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <p className="text-sm font-bold" style={{ color: TOKENS.mutedText }}>
-              Aucune notification
-            </p>
+          <div className="bg-white rounded-2xl border border-[#E8EDEA] flex items-center justify-center py-16">
+            <EmptyState
+              icon={BellOff}
+              title={EMPTY_MESSAGES[activeTab].title}
+              description={EMPTY_MESSAGES[activeTab].description}
+            />
           </div>
         ) : (
           groups.map((group) => (

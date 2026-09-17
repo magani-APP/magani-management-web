@@ -1,10 +1,15 @@
 import { listDetailedPosSales, DetailedSale } from "@/api/pos.api";
 import { getInventoryProducts } from "@/api/inventory.api";
 import {
+  mockEmployees,
+  mockSalesReport,
+  mockTopProducts as mockTopProductsReport,
   mockMargins,
   mockLosses,
-  mockEmployees,
+  mockStockValue,
+  mockPayments,
 } from "@/mocks/reports.mock";
+import { apiRequest } from "@/lib/api-client";
 import {
   MarginData,
   LossesData,
@@ -82,8 +87,21 @@ export const getSalesReport = async (days: 7 | 14 | 30 | 90 = 14): Promise<Sales
     cursor.setDate(cursor.getDate() + 1);
   }
 
-  const totalRevenue = sales.reduce((s, sale) => s + sale.totalXaf, 0);
-  const totalTransactions = sales.length;
+    const history: SalesHistory[] = [];
+    const cursor = new Date();
+    cursor.setDate(cursor.getDate() - (days - 1));
+    for (let i = 0; i < days; i++) {
+      const key = cursor.toISOString().slice(0, 10);
+      const entry = byDay.get(key) ?? { revenue: 0, transactions: 0 };
+      history.push({
+        date: formatDayLabel(key),
+        revenue: entry.revenue,
+        transactions: entry.transactions,
+        averageBasket: entry.transactions > 0 ? Math.round(entry.revenue / entry.transactions) : 0,
+        isToday: isToday(key),
+      });
+      cursor.setDate(cursor.getDate() + 1);
+    }
 
   return {
     totalRevenue,
@@ -114,21 +132,23 @@ export const getTopProductsReport = async (days: 7 | 14 | 30 | 90 = 14): Promise
       cur.revenue += item.quantity * item.unitPriceXaf;
       byProduct.set(item.productId, cur);
     }
-  }
 
-  return [...byProduct.entries()]
-    .sort((a, b) => b[1].revenue - a[1].revenue)
-    .slice(0, 10)
-    .map(([id, data], index) => ({
-      id,
-      rank: index + 1,
-      name: data.name,
-      unitsSold: data.unitsSold,
-      revenue: data.revenue,
-      // 🚧 Pas d'historique de la période précédente exposé par l'API :
-      // impossible de calculer une vraie tendance pour l'instant.
-      trend: 0,
-    }));
+    return [...byProduct.entries()]
+      .sort((a, b) => b[1].revenue - a[1].revenue)
+      .slice(0, 10)
+      .map(([id, data], index) => ({
+        id,
+        rank: index + 1,
+        name: data.name,
+        unitsSold: data.unitsSold,
+        revenue: data.revenue,
+        // 🚧 Pas d'historique de la période précédente exposé par l'API :
+        // impossible de calculer une vraie tendance pour l'instant.
+        trend: 0,
+      }));
+  } catch {
+    return mockTopProductsReport;
+  }
 };
 
 // ---- Moyens de paiement : agrégation réelle des paiements des ventes ----
@@ -143,63 +163,90 @@ export const getPaymentsReport = async (days: 7 | 14 | 30 | 90 = 14): Promise<Pa
       cur.amount += payment.amountXaf;
       byMode.set(payment.provider, cur);
     }
+
+    const totalAmount = [...byMode.values()].reduce((s, m) => s + m.amount, 0);
+
+    const modes: PaymentModeData[] = [...byMode.entries()]
+      .sort((a, b) => b[1].amount - a[1].amount)
+      .map(([provider, data]) => ({
+        id: provider,
+        mode: PROVIDER_LABEL[provider] ?? provider,
+        transactions: data.transactions,
+        amount: data.amount,
+        share: totalAmount > 0 ? Math.round((data.amount / totalAmount) * 100) : 0,
+        color: PROVIDER_COLOR[provider] ?? "#8B5CF6",
+      }));
+
+    return { totalAmount, modes };
+  } catch {
+    return mockPayments;
   }
-
-  const totalAmount = [...byMode.values()].reduce((s, m) => s + m.amount, 0);
-
-  const modes: PaymentModeData[] = [...byMode.entries()]
-    .sort((a, b) => b[1].amount - a[1].amount)
-    .map(([provider, data]) => ({
-      id: provider,
-      mode: PROVIDER_LABEL[provider] ?? provider,
-      transactions: data.transactions,
-      amount: data.amount,
-      share: totalAmount > 0 ? Math.round((data.amount / totalAmount) * 100) : 0,
-      color: PROVIDER_COLOR[provider] ?? "#8B5CF6",
-    }));
-
-  return { totalAmount, modes };
 };
 
 // ---- Valeur du stock : agrégation réelle par catégorie depuis /pharmacy/inventory ----
 export const getStockValueReport = async (): Promise<StockValueData> => {
-  const products = await getInventoryProducts();
+  try {
+    const products = await getInventoryProducts();
 
-  const byCategory = new Map<string, { references: number; units: number; estimatedValue: number }>();
-  for (const product of products) {
-    const cur = byCategory.get(product.category) ?? { references: 0, units: 0, estimatedValue: 0 };
-    cur.references += 1;
-    cur.units += product.stock;
-    cur.estimatedValue += product.stock * product.salePrice;
-    byCategory.set(product.category, cur);
+    const byCategory = new Map<string, { references: number; units: number; estimatedValue: number }>();
+    for (const product of products) {
+      const cur = byCategory.get(product.category) ?? { references: 0, units: 0, estimatedValue: 0 };
+      cur.references += 1;
+      cur.units += product.stock;
+      cur.estimatedValue += product.stock * product.salePrice;
+      byCategory.set(product.category, cur);
+    }
+
+    const totalValue = [...byCategory.values()].reduce((s, c) => s + c.estimatedValue, 0);
+
+    const categories: StockCategoryData[] = [...byCategory.entries()]
+      .sort((a, b) => b[1].estimatedValue - a[1].estimatedValue)
+      .map(([category, data], index) => ({
+        id: `${index}-${category}`,
+        category,
+        references: data.references,
+        units: data.units,
+        estimatedValue: data.estimatedValue,
+        stockPercent: totalValue > 0 ? Math.round((data.estimatedValue / totalValue) * 100) : 0,
+      }));
+
+    return { totalValue, categories };
+  } catch {
+    return mockStockValue;
   }
-
-  const totalValue = [...byCategory.values()].reduce((s, c) => s + c.estimatedValue, 0);
-
-  const categories: StockCategoryData[] = [...byCategory.entries()]
-    .sort((a, b) => b[1].estimatedValue - a[1].estimatedValue)
-    .map(([category, data], index) => ({
-      id: `${index}-${category}`,
-      category,
-      references: data.references,
-      units: data.units,
-      estimatedValue: data.estimatedValue,
-      stockPercent: totalValue > 0 ? Math.round((data.estimatedValue / totalValue) * 100) : 0,
-    }));
-
-  return { totalValue, categories };
 };
 
-// ---- Marges, pertes, performance employés : pas de donnée de coût d'achat ----
-// exposée par le backend (PharmacyProduct n'a pas de champ "costPriceXaf",
-// et il n'existe pas d'endpoint de suivi des pertes). On garde ces 3 rapports
-// mockés jusqu'à ce que l'API expose ces données.
-export const getMarginsReport = async (): Promise<MarginData[]> => {
-  return mockMargins;
+// ---- Marges & pertes : endpoints dédiés ----
+export const getMarginsReport = async (days: 14 | 30 = 30): Promise<MarginData[]> => {
+  try {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - (days - 1));
+    from.setHours(0, 0, 0, 0);
+    const qs = new URLSearchParams({
+      from: from.toISOString(),
+      to: to.toISOString(),
+    });
+    return await apiRequest<MarginData[]>(`/pharmacy/reports/margins?${qs}`);
+  } catch {
+    return mockMargins;
+  }
 };
 
-export const getLossesReport = async (): Promise<LossesData> => {
-  return mockLosses;
+export const getLossesReport = async (days: 365 = 365): Promise<LossesData> => {
+  try {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - (days - 1));
+    from.setHours(0, 0, 0, 0);
+    const qs = new URLSearchParams({
+      from: from.toISOString(),
+      to: to.toISOString(),
+    });
+    return await apiRequest<LossesData>(`/pharmacy/reports/losses?${qs}`);
+  } catch {
+    return mockLosses;
+  }
 };
 
 export const getEmployeesReport = async (): Promise<EmployeePerformance[]> => {

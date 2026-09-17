@@ -68,6 +68,7 @@ export function MarginsReport({ data }: MarginsReportProps) {
           </tbody>
         </table>
         </div>
+        )}
       </div>
     </div>
   );

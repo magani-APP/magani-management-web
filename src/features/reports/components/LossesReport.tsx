@@ -98,6 +98,7 @@ export function LossesReport({ data }: LossesReportProps) {
           </tbody>
         </table>
         </div>
+        )}
       </div>
     </div>
   );

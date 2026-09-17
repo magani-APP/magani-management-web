@@ -1,5 +1,6 @@
 import { StockValueData } from "@/types/reports";
-import { Archive } from "lucide-react";
+import { Archive, Boxes } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface StockValueReportProps {
   data: StockValueData;
@@ -67,6 +68,7 @@ export function StockValueReport({ data }: StockValueReportProps) {
           </tbody>
         </table>
         </div>
+        )}
       </div>
     </div>
   );

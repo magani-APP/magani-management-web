@@ -1,5 +1,6 @@
 import { apiRequest } from "@/lib/api-client";
 import { PaymentMethod, Product } from "../types/pos.types";
+import { mockPosProducts } from "@/mocks/pos.mock";
 
 export type { Product };
 
@@ -39,8 +40,14 @@ function toPosProduct(row: ApiPharmacyProductRow): Product {
 // Le catalogue de caisse doit refléter le vrai stock de la pharmacie :
 // on réutilise donc /pharmacy/inventory plutôt que /products (catalogue global).
 export const getProducts = async (): Promise<Product[]> => {
-  const rows = await apiRequest<ApiPharmacyProductRow[]>("/pharmacy/inventory");
-  return rows.filter((r) => r.availableQty > 0).map(toPosProduct);
+  try {
+    const rows = await apiRequest<ApiPharmacyProductRow[]>("/pharmacy/inventory");
+    return rows.filter((r) => r.availableQty > 0).map(toPosProduct);
+  } catch {
+    // Route indisponible côté backend : on retombe sur le catalogue de
+    // démonstration pour ne pas bloquer la caisse.
+    return mockPosProducts;
+  }
 };
 
 // ---- Session de caisse ----
@@ -54,7 +61,13 @@ export interface PosSession {
 }
 
 export const getCurrentPosSession = async (): Promise<PosSession | null> => {
-  return apiRequest<PosSession | null>("/pharmacy/pos/session");
+  try {
+    return await apiRequest<PosSession | null>("/pharmacy/pos/session");
+  } catch {
+    // Pas de session en cours si l'API n'est pas joignable : l'écran de
+    // caisse proposera simplement d'en ouvrir une nouvelle.
+    return null;
+  }
 };
 
 export const openPosSession = async (openingFloat: number): Promise<PosSession> => {

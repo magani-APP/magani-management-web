@@ -4,6 +4,7 @@ import { Download, Search } from "lucide-react";
 import { useActivity } from "@/hooks/activity/useActivity";
 import { ACTIVITY_FILTERS } from "@/constants/activity.constants";
 import { ActivityLogRow } from "./ActivityLogRow";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export function ActivityView() {
   const { isLoading, activeFilter, setActiveFilter, searchQuery, setSearchQuery, groups } =
@@ -72,10 +73,26 @@ export function ActivityView() {
             <div className="w-7 h-7 border-4 border-[#0B8F68] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : groups.length === 0 ? (
-          <div className="flex items-center justify-center h-[240px]">
-            <p className="text-xs font-medium text-[#9AAEA3]">
-              Aucune activité ne correspond à votre recherche.
-            </p>
+          <div className="p-6">
+            <div className="bg-white rounded-2xl border border-[#E8EDEA] flex items-center justify-center h-[240px]">
+              <EmptyState
+                icon={Search}
+                title={
+                  searchQuery
+                    ? `Aucun résultat pour « ${searchQuery} »`
+                    : activeFilter !== "tout"
+                      ? `Aucune activité de type « ${ACTIVITY_FILTERS.find((f) => f.id === activeFilter)?.label ?? ""} »`
+                      : "Aucune activité enregistrée"
+                }
+                description={
+                  searchQuery
+                    ? "Vérifiez l'orthographe ou essayez un autre employé ou une autre action."
+                    : activeFilter !== "tout"
+                      ? "Essayez un autre filtre ou revenez à l'onglet « Tout »."
+                      : "Les actions de votre équipe (ventes, stock, prix…) apparaîtront ici au fil de la journée."
+                }
+              />
+            </div>
           </div>
         ) : (
           groups.map(({ group, entries, totalCount }) => (
