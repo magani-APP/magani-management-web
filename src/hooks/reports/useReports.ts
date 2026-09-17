@@ -27,7 +27,7 @@ export function useReports() {
   const tabParam = searchParams.get("tab") as ReportTabId | null;
 
   const activeTab = tabParam || "sales";
-  const [timeFilter, setTimeFilter] = useState<"7days" | "14days">("14days");
+  const [timeFilter, setTimeFilter] = useState<"7days" | "14days" | "30days" | "90days">("14days");
   const [isLoading, setIsLoading] = useState(true);
 
   const [data, setData] = useState({
@@ -42,7 +42,7 @@ export function useReports() {
 
   useEffect(() => {
     let isMounted = true;
-    const days = timeFilter === "7days" ? 7 : 14;
+    const days = timeFilter === "7days" ? 7 : timeFilter === "30days" ? 30 : timeFilter === "90days" ? 90 : 14;
 
     setIsLoading(true);
     Promise.all([

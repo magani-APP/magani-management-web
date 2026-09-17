@@ -13,13 +13,25 @@ export interface SalesHistory {
   transactions: number;
   averageBasket: number;
   isToday?: boolean;
+  evolution?: number;
 }
 
 export interface SalesReportData {
   totalRevenue: number;
   totalTransactions: number;
   averageBasket: number;
+  totalNewCustomers: number;
+  revenueTrend?: number;
+  transactionsTrend?: number;
+  basketTrend?: number;
+  newCustomersTrend?: number;
   history: SalesHistory[];
+}
+
+export interface CategorySalesData {
+  category: string;
+  percent: number;
+  color?: string;
 }
 
 export interface TopProductData {

@@ -14,39 +14,101 @@ const formatFCFA = (value: number) => {
 };
 
 export function PaymentsReport({ data }: PaymentsReportProps) {
+  const totalAmount = data.modes.reduce((sum, mode) => sum + mode.amount, 0);
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="w-full flex flex-col gap-6">
       {/* En-tête */}
       <div>
-        <h2 className="text-[18px] font-bold text-text-foreground">Rapport des paiements</h2>
-        <p className="text-[11px] font-medium text-text-muted mt-0.5">
+        <h2 className="text-[16px] font-bold text-text-foreground">Rapport des paiements</h2>
+        <p className="text-[12px] font-medium text-text-muted mt-1">
           Modes de règlement - août 2026
         </p>
       </div>
 
       {/* Grille principale */}
-      {data.modes.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-border-card shadow-sm">
-          <EmptyState
-            icon={CreditCard}
-            title="Aucun paiement enregistré"
-            description="Aucune donnée de paiement disponible"
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-stretch">
+        
+        {/* Carte Tableau des détails (Gauche) */}
+        <div className="bg-white rounded-2xl border border-border-card shadow-sm overflow-hidden flex flex-col">
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left border-collapse min-w-[500px]">
+              <thead>
+                <tr className="border-b border-border-divider bg-surface-muted">
+                  <th className="py-4 px-6 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">
+                    Mode
+                  </th>
+                  <th className="py-4 px-6 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-center">
+                    Transactions
+                  </th>
+                  <th className="py-4 px-6 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">
+                    Montant
+                  </th>
+                  <th className="py-4 px-6 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right w-24">
+                    Part
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-divider">
+                {data.modes.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="hover:bg-surface-alt/50 transition-colors"
+                  >
+                    <td className="py-5 px-6 text-[13px] font-bold text-text-foreground">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: row.color }}
+                        />
+                        {row.mode}
+                      </div>
+                    </td>
+                    <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-center">
+                      {row.transactions}
+                    </td>
+                    <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-right">
+                      {formatFCFA(row.amount)}
+                    </td>
+                    <td className="py-5 px-6 text-right">
+                      <span
+                        className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[11px] font-bold"
+                        style={{
+                          backgroundColor: `${row.color}15`,
+                          color: row.color,
+                        }}
+                      >
+                        {row.share}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      ) : (
-      <div className="grid grid-cols-1 lg:grid-cols-[290px_1fr] gap-4 items-stretch">
-        {/* Carte Graphique Donut */}
-        <div className="bg-white rounded-2xl border border-border-card p-4 shadow-sm flex items-center justify-center min-h-[280px]">
-          <div className="w-full h-[220px] relative">
+
+        {/* Carte Graphique Donut (Droite) */}
+        <div className="bg-white rounded-2xl border border-border-card p-6 shadow-sm flex flex-col">
+          <div className="mb-6">
+            <h3 className="text-[14px] font-bold text-text-foreground">Répartition des paiements</h3>
+            <p className="text-[11px] font-medium text-text-muted mt-0.5">Par mode de règlement - août 2026</p>
+          </div>
+          
+          <div className="w-full h-[220px] relative mb-6">
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-[10px] font-bold text-text-placeholder uppercase tracking-wider mb-0.5">Total</span>
+              <span className="text-[16px] font-bold text-text-foreground whitespace-nowrap">{formatFCFA(totalAmount)}</span>
+            </div>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={data.modes}
                   cx="50%"
                   cy="50%"
-                  innerRadius={62}
-                  outerRadius={88}
-                  paddingAngle={3}
+                  innerRadius={70}
+                  outerRadius={95}
+                  paddingAngle={2}
                   dataKey="amount"
                   stroke="none"
                 >
@@ -76,66 +138,20 @@ export function PaymentsReport({ data }: PaymentsReportProps) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </div>
 
-        {/* Carte Tableau des détails */}
-        <div className="bg-white rounded-2xl border border-border-card shadow-sm overflow-hidden flex flex-col justify-between">
-          <div className="overflow-x-auto no-scrollbar">
-            <table className="w-full text-left border-collapse min-w-[320px]">
-              <thead>
-                <tr className="border-b border-border-divider bg-surface-muted">
-                  <th className="py-3 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">
-                    Mode
-                  </th>
-                  <th className="py-3 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-center">
-                    Transactions
-                  </th>
-                  <th className="py-3 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">
-                    Montant
-                  </th>
-                  <th className="py-3 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">
-                    Part
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-divider">
-                {data.modes.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="hover:bg-surface-alt/50 transition-colors"
-                  >
-                    <td className="py-3.5 px-5 text-[11px] font-bold text-text-foreground">
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          className="w-2 h-2 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: row.color }}
-                        />
-                        {row.mode}
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-5 text-[11px] font-medium text-text-muted text-center">
-                      {row.transactions}
-                    </td>
-                    <td className="py-3.5 px-5 text-[11px] font-bold text-text-foreground text-right">
-                      {formatFCFA(row.amount)}
-                    </td>
-                    <td className="py-3.5 px-5 text-right">
-                      <span
-                        className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-bold"
-                        style={{
-                          backgroundColor: `${row.color}15`,
-                          color: row.color,
-                        }}
-                      >
-                        {row.share}%
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex flex-col gap-3 mt-auto">
+            {data.modes.map((row) => (
+              <div key={row.id} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: row.color }} />
+                  <span className="text-[12px] font-medium text-text-muted">{row.mode}</span>
+                </div>
+                <span className="text-[12px] font-bold" style={{ color: row.color }}>{row.share}%</span>
+              </div>
+            ))}
           </div>
         </div>
+
       </div>
       )}
     </div>

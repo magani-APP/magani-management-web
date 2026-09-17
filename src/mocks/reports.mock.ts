@@ -6,29 +6,43 @@ import {
   LossesData,
   EmployeePerformance,
   PaymentsData,
+  CategorySalesData,
 } from "@/types/reports";
 
 export const mockSalesReport: SalesReportData = {
   totalRevenue: 2172000,
   totalTransactions: 429,
   averageBasket: 5063,
+  totalNewCustomers: 128,
+  revenueTrend: 12.5,
+  transactionsTrend: 8.1,
+  basketTrend: 4.3,
+  newCustomersTrend: 18.7,
   history: [
-    { date: "27/07", revenue: 132000, transactions: 26, averageBasket: 5077 },
-    { date: "28/07", revenue: 151000, transactions: 30, averageBasket: 5033 },
-    { date: "29/07", revenue: 148000, transactions: 30, averageBasket: 4933 },
-    { date: "30/07", revenue: 159000, transactions: 31, averageBasket: 5129 },
-    { date: "31/07", revenue: 172000, transactions: 34, averageBasket: 5059 },
-    { date: "01/08", revenue: 164000, transactions: 32, averageBasket: 5125 },
-    { date: "02/08", revenue: 158000, transactions: 31, averageBasket: 5097 },
-    { date: "03/08", revenue: 145000, transactions: 29, averageBasket: 5000 },
-    { date: "04/08", revenue: 168000, transactions: 33, averageBasket: 5091 },
-    { date: "05/08", revenue: 154000, transactions: 30, averageBasket: 5133 },
-    { date: "06/08", revenue: 179000, transactions: 35, averageBasket: 5114 },
-    { date: "07/08", revenue: 162000, transactions: 32, averageBasket: 5063 },
-    { date: "08/08", revenue: 171000, transactions: 34, averageBasket: 5029 },
-    { date: "09/08", revenue: 168500, transactions: 34, averageBasket: 4956, isToday: true },
+    { date: "27/07", revenue: 132000, transactions: 26, averageBasket: 5077, evolution: -2.4 },
+    { date: "28/07", revenue: 151000, transactions: 30, averageBasket: 5033, evolution: 14.3 },
+    { date: "29/07", revenue: 148000, transactions: 30, averageBasket: 4933, evolution: -1.9 },
+    { date: "30/07", revenue: 159000, transactions: 31, averageBasket: 5129, evolution: 7.4 },
+    { date: "31/07", revenue: 172000, transactions: 34, averageBasket: 5059, evolution: 8.1 },
+    { date: "01/08", revenue: 164000, transactions: 32, averageBasket: 5125, evolution: -4.6 },
+    { date: "02/08", revenue: 158000, transactions: 31, averageBasket: 5097, evolution: -3.6 },
+    { date: "03/08", revenue: 143000, transactions: 28, averageBasket: 5107, evolution: -3.6 },
+    { date: "04/08", revenue: 167000, transactions: 33, averageBasket: 5061, evolution: 9.1 },
+    { date: "05/08", revenue: 154000, transactions: 30, averageBasket: 5133, evolution: -4.8 },
+    { date: "06/08", revenue: 178000, transactions: 35, averageBasket: 5086, evolution: 12.4 },
+    { date: "07/08", revenue: 162000, transactions: 32, averageBasket: 5063, evolution: -2.1 },
+    { date: "08/08", revenue: 171000, transactions: 34, averageBasket: 5029, evolution: 8.6 },
+    { date: "09/08", revenue: 168500, transactions: 34, averageBasket: 4956, isToday: true, evolution: 6.2 },
   ],
 };
+
+export const mockCategorySales: CategorySalesData[] = [
+  { category: "Médicaments", percent: 42, color: "#0B8F68" },
+  { category: "Parapharmacie", percent: 24, color: "#0B8F68" },
+  { category: "Hygiène & Soins", percent: 18, color: "#0B8F68" },
+  { category: "Compléments", percent: 10, color: "#0B8F68" },
+  { category: "Autres", percent: 6, color: "#0B8F68" },
+];
 
 export const mockTopProducts: TopProductData[] = [
   { id: "p1", rank: 1, name: "Paracétamol 500mg", unitsSold: 1247, revenue: 1870500, trend: 12 },

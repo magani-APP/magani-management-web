@@ -26,16 +26,16 @@ export function MagaWidget() {
   if (HIDDEN_ON.includes(pathname) || FULL_PAGE.includes(pathname)) return null;
 
   return (
-    <div className="fixed bottom-[92px] lg:bottom-5 right-4 lg:right-5 z-40 flex flex-col items-end gap-3">
+    <div className="fixed bottom-[92px] lg:bottom-6 right-4 lg:right-6 z-50 flex flex-col items-end gap-3 pointer-events-none">
       {open ? (
         <>
           {/* Fond assombri — mobile uniquement, le panneau devient quasi plein écran */}
           <div
-            className="lg:hidden fixed inset-0 z-30 bg-black/30 backdrop-blur-[1px]"
+            className="lg:hidden fixed inset-0 z-30 bg-black/30 backdrop-blur-[1px] pointer-events-auto"
             onClick={() => setOpen(false)}
           />
           <section
-            className="fixed inset-x-3 top-[76px] bottom-[84px] z-40 lg:static lg:inset-auto lg:z-auto lg:w-[340px] lg:h-[520px] max-w-[calc(100vw-24px)] bg-white lg:bg-white/92 lg:backdrop-blur-[24px] border border-border-glass rounded-3xl shadow-sidebar overflow-hidden flex flex-col"
+            className="fixed inset-x-3 top-[76px] bottom-[84px] z-40 lg:static lg:inset-auto lg:z-auto lg:w-[340px] lg:h-[520px] max-w-[calc(100vw-24px)] bg-white lg:bg-white/92 lg:backdrop-blur-[24px] border border-border-glass rounded-3xl shadow-sidebar overflow-hidden flex flex-col pointer-events-auto"
           >
             <header className="flex items-center gap-2 px-4 py-3 border-b border-border-divider flex-shrink-0">
               <div className="w-[56px] h-[68px] lg:w-[72px] lg:h-[86px] shrink-0">
@@ -70,7 +70,7 @@ export function MagaWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="relative group"
+          className="relative group pointer-events-auto"
           aria-label="Ouvrir Maga"
         >
           <span className="hidden lg:block absolute -top-9 right-1 whitespace-nowrap rounded-full bg-brand-darkest text-white text-[10px] font-bold px-2.5 py-1 opacity-90 group-hover:opacity-100">

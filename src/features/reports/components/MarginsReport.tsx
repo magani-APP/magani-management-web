@@ -1,6 +1,6 @@
 import { MarginData } from "@/types/reports";
-import { Pill, BarChart3 } from "lucide-react";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { Pill } from "lucide-react";
+import { cn } from "../../../lib/utils";
 
 interface MarginsReportProps {
   data: MarginData[];
@@ -20,51 +20,49 @@ export function MarginsReport({ data }: MarginsReportProps) {
         </p>
       </div>
 
-      <div className="lg:max-w-[710px] rounded-2xl border border-border-card bg-white overflow-hidden shadow-sm">
-        {data.length === 0 ? (
-          <EmptyState
-            icon={BarChart3}
-            title="Pas encore de marge à afficher"
-            description="Aucune donnée de marge disponible pour cette période."
-          />
-        ) : (
+      <div className="w-full rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
         <div className="overflow-x-auto no-scrollbar">
-        <table className="w-full text-left border-collapse min-w-[560px]">
+        <table className="w-full text-left border-collapse min-w-[600px]">
           <thead>
             <tr className="bg-surface-muted border-b border-border-divider">
-              <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Produit</th>
-              <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] w-[200px]">Marge %</th>
-              <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">CA généré</th>
-              <th className="py-3.5 px-4 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">Marge nette estimée</th>
+              <th className="py-4 px-6 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] w-12 text-center">#</th>
+              <th className="py-4 px-6 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Produit</th>
+              <th className="py-4 px-6 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] w-[200px]">Marge %</th>
+              <th className="py-4 px-6 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">CA généré</th>
+              <th className="py-4 px-6 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em] text-right">Marge nette estimée</th>
             </tr>
           </thead>
           <tbody>
-            {data.map((row) => (
+            {data.map((row, index) => (
               <tr
                 key={row.id}
                 className="bg-white/88 border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
               >
-                <td className="py-4 px-4 text-[11px] font-bold text-text-foreground">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-[#F0F7F3] flex items-center justify-center border border-[rgba(11,143,104,0.1)]">
-                      <Pill size={12} className="text-brand-primary opacity-60" />
+                <td className="py-5 px-6 text-[12px] font-bold text-text-placeholder text-center">{index + 1}</td>
+                <td className="py-5 px-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                      <Pill size={14} className="text-[#0B8F68]" />
                     </div>
-                    {row.name}
+                    <span className="text-[13px] font-bold text-text-foreground truncate">{row.name}</span>
                   </div>
                 </td>
-                <td className="py-4 px-4">
+                <td className="py-5 px-6">
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-1.5 bg-surface-alt rounded-full overflow-hidden border border-border-card">
                       <div
-                        className="h-full bg-brand-primary rounded-full"
-                        style={{ width: `${row.marginPercent}%`, backgroundColor: '#A8F24A' }}
+                        className={cn(
+                          "h-full rounded-full",
+                          row.marginPercent > 50 ? "bg-lime-500" : "bg-emerald-600"
+                        )}
+                        style={{ width: `${row.marginPercent}%` }}
                       />
                     </div>
-                    <span className="text-[11px] font-bold text-text-foreground w-8">{row.marginPercent}%</span>
+                    <span className="text-[13px] font-bold text-text-foreground w-8">{row.marginPercent}%</span>
                   </div>
                 </td>
-                <td className="py-4 px-4 text-[11px] font-bold text-text-foreground text-right">{formatFCFA(row.revenue)}</td>
-                <td className="py-4 px-4 text-[11px] font-bold text-brand-primary text-right">{formatFCFA(row.netMargin)}</td>
+                <td className="py-5 px-6 text-[13px] font-bold text-text-foreground text-right">{formatFCFA(row.revenue)}</td>
+                <td className="py-5 px-6 text-[13px] text-emerald-600 font-semibold text-right">{formatFCFA(row.netMargin)}</td>
               </tr>
             ))}
           </tbody>
