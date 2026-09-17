@@ -33,7 +33,7 @@ export function ReservationDetail({ reservation, onUpdateStatus, onClose }: Rese
     // Sur mobile, tant qu'aucune réservation n'est sélectionnée, la liste
     // occupe tout l'écran — cet état vide ne s'affiche qu'à partir de lg.
     return (
-      <div className="hidden lg:flex flex-1 flex-col items-center justify-center h-full gap-2 text-gray-400 bg-[#FAFAFA]">
+      <div className="hidden lg:flex lg:col-span-5 flex-col items-center justify-center h-full gap-2 text-gray-400 bg-[#FAFAFA]">
         <CalendarCheck size={32} strokeWidth={1.5} className="text-gray-300" />
         <p className="text-[13px] font-medium text-gray-400">Sélectionnez une réservation</p>
       </div>
@@ -114,7 +114,7 @@ export function ReservationDetail({ reservation, onUpdateStatus, onClose }: Rese
   };
 
   return (
-    <div className="fixed inset-0 z-40 lg:static lg:z-auto lg:flex-1 bg-background-secondary overflow-y-auto no-scrollbar flex flex-col">
+    <div className="fixed inset-0 z-40 lg:static lg:z-auto lg:col-span-5 bg-background-secondary overflow-y-auto no-scrollbar flex flex-col h-full">
       {/* Bouton retour — mobile uniquement, la fiche est plein écran */}
       <button
         type="button"
@@ -125,7 +125,7 @@ export function ReservationDetail({ reservation, onUpdateStatus, onClose }: Rese
         Réservations
       </button>
 
-      <div className="w-full max-w-[500px] py-4 px-5 mt-1 lg:mt-5 mx-5 flex flex-col gap-5">
+      <div className="w-full h-full py-5 px-6 lg:px-10 lg:pt-8 lg:pb-28 flex flex-col gap-5">
         <div className="flex items-start justify-between mb-0.5">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
