@@ -76,7 +76,6 @@ export function TopProductsReport({ data }: TopProductsReportProps) {
           </tbody>
         </table>
         </div>
-        )}
       </div>
     </div>
   );

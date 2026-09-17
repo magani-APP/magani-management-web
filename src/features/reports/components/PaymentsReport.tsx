@@ -153,7 +153,6 @@ export function PaymentsReport({ data }: PaymentsReportProps) {
         </div>
 
       </div>
-      )}
     </div>
   );
 }

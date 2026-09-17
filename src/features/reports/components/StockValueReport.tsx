@@ -68,7 +68,6 @@ export function StockValueReport({ data }: StockValueReportProps) {
           </tbody>
         </table>
         </div>
-        )}
       </div>
     </div>
   );
