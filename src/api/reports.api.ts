@@ -54,7 +54,7 @@ async function fetchSales(days: number): Promise<DetailedSale[]> {
 }
 
 // ---- Rapport ventes : agrégation jour par jour des vraies ventes ----
-export const getSalesReport = async (days: 7 | 14 = 14): Promise<SalesReportData> => {
+export const getSalesReport = async (days: 7 | 14 | 30 | 90 = 14): Promise<SalesReportData> => {
   const sales = await fetchSales(days);
 
   const byDay = new Map<string, { revenue: number; transactions: number }>();
@@ -89,12 +89,17 @@ export const getSalesReport = async (days: 7 | 14 = 14): Promise<SalesReportData
     totalRevenue,
     totalTransactions,
     averageBasket: totalTransactions > 0 ? Math.round(totalRevenue / totalTransactions) : 0,
+    totalNewCustomers: 128, // Mocked for UI update
+    revenueTrend: 12.5,
+    transactionsTrend: 8.1,
+    basketTrend: 4.3,
+    newCustomersTrend: 18.7,
     history,
   };
 };
 
 // ---- Top produits : agrégation des lignes de vente réelles ----
-export const getTopProductsReport = async (days: 14 | 7 = 14): Promise<TopProductData[]> => {
+export const getTopProductsReport = async (days: 7 | 14 | 30 | 90 = 14): Promise<TopProductData[]> => {
   const sales = await fetchSales(days);
 
   const byProduct = new Map<string, { name: string; unitsSold: number; revenue: number }>();
@@ -127,7 +132,7 @@ export const getTopProductsReport = async (days: 14 | 7 = 14): Promise<TopProduc
 };
 
 // ---- Moyens de paiement : agrégation réelle des paiements des ventes ----
-export const getPaymentsReport = async (days: 14 | 7 = 14): Promise<PaymentsData> => {
+export const getPaymentsReport = async (days: 7 | 14 | 30 | 90 = 14): Promise<PaymentsData> => {
   const sales = await fetchSales(days);
 
   const byMode = new Map<string, { transactions: number; amount: number }>();

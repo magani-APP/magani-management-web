@@ -10,6 +10,7 @@ import { LossesReport } from "@/features/reports/components/LossesReport";
 import { EmployeesReport } from "@/features/reports/components/EmployeesReport";
 import { PaymentsReport } from "@/features/reports/components/PaymentsReport";
 import { Suspense } from "react";
+import { mockCategorySales } from "@/mocks/reports.mock";
 
 function ReportsContent() {
   const { activeTab, timeFilter, setTimeFilter, data } = useReports();
@@ -17,7 +18,16 @@ function ReportsContent() {
   const renderActiveTab = () => {
     switch (activeTab) {
       case "sales":
-        return <SalesReport data={data.sales} timeFilter={timeFilter} onTimeFilterChange={setTimeFilter} />;
+        return (
+          <SalesReport 
+            data={data.sales} 
+            timeFilter={timeFilter} 
+            onTimeFilterChange={setTimeFilter} 
+            paymentsData={data.payments}
+            topProductsData={data.topProducts}
+            categorySalesData={mockCategorySales}
+          />
+        );
       case "top-products":
         return <TopProductsReport data={data.topProducts} />;
       case "margins":
