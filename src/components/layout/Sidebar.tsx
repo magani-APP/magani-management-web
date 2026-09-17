@@ -61,6 +61,14 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
     setIsLoggingOut(true);
     try {
       await logout();
+    } catch (error) {
+      // On ignore l'erreur : la session locale est de toute façon nettoyée
+      // et l'utilisateur est redirigé vers /login. Sans ce catch, l'erreur
+      // (ex: 429 "Trop de requêtes") remonte comme exception non gérée et
+      // déclenche l'overlay "1 Issue" de Next.js en dev.
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[Logout]", error);
+      }
     } finally {
       router.replace("/login");
     }
