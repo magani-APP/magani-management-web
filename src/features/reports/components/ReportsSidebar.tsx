@@ -33,6 +33,7 @@ export function ReportsSidebar({ activeTab }: ReportsSidebarProps) {
             return (
               <Link
                 key={tab.id}
+                id={`reports-tab-${tab.id}`}
                 href={`/reports?tab=${tab.id}`}
                 className={cn(
                   "flex items-center gap-2 lg:gap-3 px-3.5 py-2 lg:py-2.5 rounded-4xl transition-all duration-150 shrink-0 whitespace-nowrap",

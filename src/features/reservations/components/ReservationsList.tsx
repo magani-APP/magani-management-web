@@ -41,7 +41,7 @@ export function ReservationsList({
   const pendingCount = counts['Nouvelles'] || 0;
 
   return (
-    <div className="flex flex-col h-full bg-white/88 lg:border-r border-border-card w-full lg:w-[400px] lg:flex-shrink-0 select-none">
+    <div className="flex flex-col h-full bg-white/88 lg:border-r border-border-card w-full lg:col-span-7 select-none overflow-hidden">
       {/* En-tête & Filtres */}
       <div className="p-5 border-b border-border-card flex flex-col gap-4">
         <div className="flex items-center justify-between">

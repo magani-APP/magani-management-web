@@ -103,6 +103,7 @@ export function Sidebar({ user, pharmacy }: SidebarProps) {
                   <Link
                     key={item.name}
                     href={item.href}
+                    id={item.name === "Rapports" ? "sidebar-nav-reports" : undefined}
                     className={`flex items-center gap-3 px-3 py-2 rounded-4xl text-xs font-medium transition-all duration-150 ${isActive
                       ? "bg-brand-primary text-white shadow-button"
                       : "text-text-secondary hover:bg-surface-muted hover:text-brand-primary"

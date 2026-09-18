@@ -35,7 +35,7 @@ export function ReservationsLayout() {
   }
 
   return (
-    <div className="flex h-full bg-background overflow-hidden">
+    <div className="grid lg:grid-cols-12 h-full bg-background w-full overflow-hidden">
       <ReservationsList
         reservations={reservations}
         activeFilter={activeFilter}
