@@ -3,7 +3,8 @@
 import { SalesReportData, PaymentsData, TopProductData, CategorySalesData } from "@/types/reports";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { cn } from "../../../lib/utils";
-import { Wallet, ShoppingCart, TrendingUp, Users, ArrowUpRight, ArrowDownRight, Calendar, ChevronDown } from "lucide-react";
+import { Wallet, ShoppingCart, TrendingUp, Users, ArrowUpRight, ArrowDownRight, Calendar, ChevronDown, PieChart as PieChartIcon, Receipt, Tags, Trophy } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface SalesReportProps {
   data: SalesReportData;
@@ -48,6 +49,11 @@ export function SalesReport({
 }: SalesReportProps) {
   // Sort history descending for the table (newest first)
   const sortedHistory = [...data.history].reverse();
+
+  const hasSalesData = data.history.some((h) => h.revenue > 0 || h.transactions > 0);
+  const hasPaymentsData = !!paymentsData && paymentsData.modes.length > 0 && paymentsData.totalAmount > 0;
+  const hasCategoryData = (categorySalesData || []).length > 0;
+  const hasTopProductsData = (topProductsData || []).length > 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -190,43 +196,55 @@ export function SalesReport({
         {/* Donut Chart */}
         <div className="p-5 rounded-2xl bg-white/88 border border-border-card h-[360px] flex flex-col">
           <div className="text-[14px] font-bold text-text-foreground mb-4">Répartition par mode de paiement</div>
-          <div className="flex-1 min-h-0 relative flex items-center justify-center">
-            <div className="w-48 h-48 relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={paymentsData?.modes || []}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="70%"
-                    outerRadius="100%"
-                    paddingAngle={3}
-                    dataKey="share"
-                    stroke="none"
-                  >
-                    {(paymentsData?.modes || []).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <div className="text-[16px] font-bold text-text-foreground">{formatFCFA(paymentsData?.totalAmount || 0).replace(" FCFA", "")}</div>
-                <div className="text-[10px] font-bold text-text-placeholder uppercase">FCFA</div>
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2">
-            {(paymentsData?.modes || []).map((mode) => (
-              <div key={mode.id} className="flex flex-col items-start">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: mode.color }} />
-                  <span className="text-[11px] font-medium text-text-muted">{mode.mode}</span>
+          {hasPaymentsData ? (
+            <>
+              <div className="flex-1 min-h-0 relative flex items-center justify-center">
+                <div className="w-48 h-48 relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={paymentsData?.modes || []}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius="70%"
+                        outerRadius="100%"
+                        paddingAngle={3}
+                        dataKey="share"
+                        stroke="none"
+                      >
+                        {(paymentsData?.modes || []).map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <div className="text-[16px] font-bold text-text-foreground">{formatFCFA(paymentsData?.totalAmount || 0).replace(" FCFA", "")}</div>
+                    <div className="text-[10px] font-bold text-text-placeholder uppercase">FCFA</div>
+                  </div>
                 </div>
-                <span className="text-[11px] font-bold text-text-foreground ml-4">{mode.share}%</span>
               </div>
-            ))}
-          </div>
+              <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2">
+                {(paymentsData?.modes || []).map((mode) => (
+                  <div key={mode.id} className="flex flex-col items-start">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: mode.color }} />
+                      <span className="text-[11px] font-medium text-text-muted">{mode.mode}</span>
+                    </div>
+                    <span className="text-[11px] font-bold text-text-foreground ml-4">{mode.share}%</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 min-h-0 flex items-center justify-center">
+              <EmptyState
+                icon={PieChartIcon}
+                title="Aucun paiement enregistré"
+                description="La répartition par mode de règlement s'affichera ici dès que des ventes auront été encaissées."
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -236,52 +254,60 @@ export function SalesReport({
           <div className="p-5 border-b border-border-divider">
             <h3 className="text-[14px] font-bold text-text-foreground">Détail des ventes journalières</h3>
           </div>
-          <div className="overflow-x-auto no-scrollbar">
-            <table className="w-full text-left border-collapse min-w-[600px]">
-              <thead>
-                <tr className="bg-surface-alt border-b border-border-divider">
-                  <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Date</th>
-                  <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">CA Journalier</th>
-                  <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Transactions</th>
-                  <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Panier moyen</th>
-                  <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Évolution</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedHistory.map((row, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
-                  >
-                    <td className="py-3.5 px-5 text-[11px] font-medium text-text-foreground flex items-center gap-2">
-                      {row.date}
-                      {row.isToday && (
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#0B8F68] text-white">
-                          Aujourd&apos;hui
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-5 text-[11px] font-bold text-text-foreground">{formatFCFA(row.revenue)}</td>
-                    <td className="py-3.5 px-5 text-[11px] font-medium text-text-muted">{row.transactions}</td>
-                    <td className="py-3.5 px-5 text-[11px] font-medium text-text-muted">{formatFCFA(row.averageBasket)}</td>
-                    <td className="py-3.5 px-5">
-                      {row.evolution !== undefined ? (
-                        <div className={cn(
-                          "inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold",
-                          row.evolution > 0 ? "text-[#0B8F68] bg-[#E8F5F1]" : "text-[#EF4444] bg-[#FEF2F2]"
-                        )}>
-                          {row.evolution > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                          {formatPercent(row.evolution).replace("+", "")}
-                        </div>
-                      ) : (
-                        <span className="text-[11px] text-text-placeholder">-</span>
-                      )}
-                    </td>
+          {hasSalesData ? (
+            <div className="overflow-x-auto no-scrollbar">
+              <table className="w-full text-left border-collapse min-w-[600px]">
+                <thead>
+                  <tr className="bg-surface-alt border-b border-border-divider">
+                    <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Date</th>
+                    <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">CA Journalier</th>
+                    <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Transactions</th>
+                    <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Panier moyen</th>
+                    <th className="py-3.5 px-5 text-[9px] font-bold text-text-placeholder uppercase tracking-[0.08em]">Évolution</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {sortedHistory.map((row, index) => (
+                    <tr
+                      key={index}
+                      className="border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
+                    >
+                      <td className="py-3.5 px-5 text-[11px] font-medium text-text-foreground flex items-center gap-2">
+                        {row.date}
+                        {row.isToday && (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#0B8F68] text-white">
+                            Aujourd&apos;hui
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-5 text-[11px] font-bold text-text-foreground">{formatFCFA(row.revenue)}</td>
+                      <td className="py-3.5 px-5 text-[11px] font-medium text-text-muted">{row.transactions}</td>
+                      <td className="py-3.5 px-5 text-[11px] font-medium text-text-muted">{formatFCFA(row.averageBasket)}</td>
+                      <td className="py-3.5 px-5">
+                        {row.evolution !== undefined ? (
+                          <div className={cn(
+                            "inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold",
+                            row.evolution > 0 ? "text-[#0B8F68] bg-[#E8F5F1]" : "text-[#EF4444] bg-[#FEF2F2]"
+                          )}>
+                            {row.evolution > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                            {formatPercent(row.evolution).replace("+", "")}
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-text-placeholder">-</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <EmptyState
+              icon={Receipt}
+              title="Aucune vente enregistrée"
+              description="Le détail des ventes journalières apparaîtra ici dès que des transactions seront enregistrées."
+            />
+          )}
         </div>
 
         {/* Right column - Ventes par catégorie & Top 5 produits */}
@@ -291,22 +317,31 @@ export function SalesReport({
               <h3 className="text-[14px] font-bold text-text-foreground">Ventes par catégorie</h3>
               <button className="text-[11px] font-bold text-brand-primary hover:underline">Voir tout</button>
             </div>
-            <div className="space-y-4">
-              {(categorySalesData || []).map((cat, idx) => (
-                <div key={idx} className="flex flex-col gap-1.5">
-                  <div className="flex justify-between text-[11px]">
-                    <span className="font-medium text-text-foreground">{cat.category}</span>
-                    <span className="font-bold text-text-foreground">{cat.percent}%</span>
+            {hasCategoryData ? (
+              <div className="space-y-4">
+                {(categorySalesData || []).map((cat, idx) => (
+                  <div key={idx} className="flex flex-col gap-1.5">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="font-medium text-text-foreground">{cat.category}</span>
+                      <span className="font-bold text-text-foreground">{cat.percent}%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-surface-alt rounded-full overflow-hidden">
+                      <div 
+                        className="h-full rounded-full" 
+                        style={{ width: `${cat.percent}%`, backgroundColor: cat.color || "#0B8F68" }} 
+                      />
+                    </div>
                   </div>
-                  <div className="h-1.5 w-full bg-surface-alt rounded-full overflow-hidden">
-                    <div 
-                      className="h-full rounded-full" 
-                      style={{ width: `${cat.percent}%`, backgroundColor: cat.color || "#0B8F68" }} 
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon={Tags}
+                title="Aucune catégorie vendue"
+                description="La répartition des ventes par catégorie s'affichera ici dès vos premières ventes."
+                className="py-8"
+              />
+            )}
           </div>
 
           <div className="p-5 rounded-2xl bg-white/88 border border-border-card">
@@ -314,19 +349,30 @@ export function SalesReport({
               <h3 className="text-[14px] font-bold text-text-foreground">Top 5 produits vendus</h3>
               <button className="text-[11px] font-bold text-brand-primary hover:underline">Voir tout</button>
             </div>
-            <div className="space-y-4">
-              {(topProductsData || []).slice(0, 5).map((prod, idx) => (
-                <div key={prod.id} className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-md bg-surface-alt flex items-center justify-center text-[11px] font-bold text-text-muted">
-                    {idx + 1}
+            {hasTopProductsData ? (
+              <div className="space-y-4">
+                {(topProductsData || []).slice(0, 5).map((prod, idx) => (
+                  <div key={prod.id} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-md bg-surface-alt flex items-center justify-center text-[11px] font-bold text-text-muted">
+                      {idx + 1}
+                    </div>
+                    <div className="flex-1 flex justify-between items-center min-w-0">
+                      <span className="text-[12px] font-medium text-text-foreground truncate pr-2">{prod.name}</span>
+                      <span className="text-[11px] font-medium text-text-muted whitespace-nowrap">{prod.unitsSold} ventes</span>
+                    </div>
                   </div>
-                  <div className="flex-1 flex justify-between items-center min-w-0">
-                    <span className="text-[12px] font-medium text-text-foreground truncate pr-2">{prod.name}</span>
-                    <span className="text-[11px] font-medium text-text-muted whitespace-nowrap">{prod.unitsSold} ventes</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-border-card bg-white">
+                <EmptyState
+                  icon={Trophy}
+                  title="Aucun produit vendu"
+                  description="Votre classement des meilleurs produits apparaîtra ici dès vos premières ventes."
+                  className="py-8"
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

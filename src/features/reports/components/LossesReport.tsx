@@ -63,7 +63,7 @@ export function LossesReport({ data }: LossesReportProps) {
         </div>
       </div>
 
-      <div className="w-full rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
+      <div className="w-full rounded-2xl border border-border-card bg-white overflow-hidden shadow-sm">
         {data.items.length > 0 ? (
           <div className="overflow-x-auto no-scrollbar">
           <table className="w-full text-left border-collapse min-w-[620px]">

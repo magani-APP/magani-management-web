@@ -20,7 +20,7 @@ export function StockValueReport({ data }: StockValueReportProps) {
         </p>
       </div>
 
-      <div className="w-full bg-white/88 p-6 rounded-2xl bg-surface-main border border-border-card shadow-[0_4px_12px_rgba(11,143,104,0.03)] flex items-center gap-5">
+      <div className="w-full bg-white p-6 rounded-2xl border border-border-card shadow-[0_4px_12px_rgba(11,143,104,0.03)] flex items-center gap-5">
         <div className="w-14 h-14 rounded-xl bg-[#F0F7F3] flex items-center justify-center border border-[rgba(11,143,104,0.1)]">
           <Archive size={28} className="text-[#0B8F68]" />
         </div>
@@ -30,7 +30,7 @@ export function StockValueReport({ data }: StockValueReportProps) {
         </div>
       </div>
 
-      <div className="w-full rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
+      <div className="w-full rounded-2xl border border-border-card bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto no-scrollbar">
         <table className="w-full text-left border-collapse min-w-[620px]">
           <thead>
@@ -43,28 +43,42 @@ export function StockValueReport({ data }: StockValueReportProps) {
             </tr>
           </thead>
           <tbody>
-            {data.categories.map((row) => (
-              <tr
-                key={row.id}
-                className="bg-white/88 border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
-              >
-                <td className="py-5 px-6 text-[13px] font-bold text-text-foreground">{row.category}</td>
-                <td className="py-5 px-6 text-[13px] font-medium text-text-muted text-center">{row.references}</td>
-                <td className="py-5 px-6 text-[13px] font-bold text-text-foreground text-center">{row.units} u.</td>
-                <td className="py-5 px-6 text-[13px] font-bold text-text-foreground text-right">{formatFCFA(row.estimatedValue)}</td>
-                <td className="py-5 px-6">
-                  <div className="flex items-center justify-end gap-4">
-                    <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-emerald-600 rounded-full"
-                        style={{ width: `${row.stockPercent}%` }}
-                      />
+            {data.categories.length > 0 ? (
+              data.categories.map((row) => (
+                <tr
+                  key={row.id}
+                  className="bg-white/88 border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
+                >
+                  <td className="py-5 px-6 text-[13px] font-bold text-text-foreground">{row.category}</td>
+                  <td className="py-5 px-6 text-[13px] font-medium text-text-muted text-center">{row.references}</td>
+                  <td className="py-5 px-6 text-[13px] font-bold text-text-foreground text-center">{row.units} u.</td>
+                  <td className="py-5 px-6 text-[13px] font-bold text-text-foreground text-right">{formatFCFA(row.estimatedValue)}</td>
+                  <td className="py-5 px-6">
+                    <div className="flex items-center justify-end gap-4">
+                      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-600 rounded-full"
+                          style={{ width: `${row.stockPercent}%` }}
+                        />
+                      </div>
+                      <span className="text-[13px] font-bold text-text-foreground w-10 text-right">{row.stockPercent}%</span>
                     </div>
-                    <span className="text-[13px] font-bold text-text-foreground w-10 text-right">{row.stockPercent}%</span>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="p-0">
+                  <div className="bg-white">
+                    <EmptyState
+                      icon={Boxes}
+                      title="Aucun stock valorisé"
+                      description="La répartition de la valeur du stock par catégorie s'affichera ici dès que des produits seront en stock."
+                    />
                   </div>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
         </div>
