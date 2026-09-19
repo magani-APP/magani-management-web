@@ -1,4 +1,6 @@
 import { EmployeePerformance } from "@/types/reports";
+import { Users } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface EmployeesReportProps {
   data: EmployeePerformance[];
@@ -18,7 +20,7 @@ export function EmployeesReport({ data }: EmployeesReportProps) {
         </p>
       </div>
 
-      <div className="w-full rounded-2xl border border-border-card bg-surface-main overflow-hidden shadow-sm">
+      <div className="w-full rounded-2xl border border-border-card bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto no-scrollbar">
         <table className="w-full text-left border-collapse min-w-[620px]">
           <thead>
@@ -31,38 +33,52 @@ export function EmployeesReport({ data }: EmployeesReportProps) {
             </tr>
           </thead>
           <tbody>
-            {data.map((row) => (
-              <tr
-                key={row.id}
-                className="bg-white/88 border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
-              >
-                <td className="py-5 px-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-[#0B8F68] flex items-center justify-center border border-[rgba(11,143,104,0.1)] text-[11px] font-bold text-white shrink-0">
-                      {row.initials}
+            {data.length > 0 ? (
+              data.map((row) => (
+                <tr
+                  key={row.id}
+                  className="bg-white/88 border-b border-border-divider hover:bg-surface-alt transition-colors last:border-0"
+                >
+                  <td className="py-5 px-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-[#0B8F68] flex items-center justify-center border border-[rgba(11,143,104,0.1)] text-[11px] font-bold text-white shrink-0">
+                        {row.initials}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[13px] font-bold text-text-foreground leading-tight">{row.name}</span>
+                        <span className="text-[12px] font-medium text-text-muted mt-0.5">{row.role}</span>
+                      </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-[13px] font-bold text-text-foreground leading-tight">{row.name}</span>
-                      <span className="text-[12px] font-medium text-text-muted mt-0.5">{row.role}</span>
+                  </td>
+                  <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-center">{row.salesCount}</td>
+                  <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-right">{formatFCFA(row.revenue)}</td>
+                  <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-right">{formatFCFA(row.averageBasket)}</td>
+                  <td className="py-5 px-6">
+                    <div className="flex items-center justify-end gap-4">
+                      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-600 rounded-full"
+                          style={{ width: `${row.revenueShare}%` }}
+                        />
+                      </div>
+                      <span className="text-[13px] font-medium text-text-muted w-10 text-right">{row.revenueShare}%</span>
                     </div>
-                  </div>
-                </td>
-                <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-center">{row.salesCount}</td>
-                <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-right">{formatFCFA(row.revenue)}</td>
-                <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-right">{formatFCFA(row.averageBasket)}</td>
-                <td className="py-5 px-6">
-                  <div className="flex items-center justify-end gap-4">
-                    <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-emerald-600 rounded-full"
-                        style={{ width: `${row.revenueShare}%` }}
-                      />
-                    </div>
-                    <span className="text-[13px] font-medium text-text-muted w-10 text-right">{row.revenueShare}%</span>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="p-0">
+                  <div className="bg-white">
+                    <EmptyState
+                      icon={Users}
+                      title="Aucune performance à afficher"
+                      description="Les ventes par employé s'afficheront ici dès que des transactions seront enregistrées en caisse."
+                    />
                   </div>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
         </div>

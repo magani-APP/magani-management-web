@@ -2,7 +2,7 @@
 
 import { PaymentsData } from "@/types/reports";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { CreditCard } from "lucide-react";
+import { CreditCard, PieChart as PieChartIcon } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 interface PaymentsReportProps {
@@ -15,6 +15,7 @@ const formatFCFA = (value: number) => {
 
 export function PaymentsReport({ data }: PaymentsReportProps) {
   const totalAmount = data.modes.reduce((sum, mode) => sum + mode.amount, 0);
+  const hasData = data.modes.length > 0 && totalAmount > 0;
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -50,39 +51,53 @@ export function PaymentsReport({ data }: PaymentsReportProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-divider">
-                {data.modes.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="hover:bg-surface-alt/50 transition-colors"
-                  >
-                    <td className="py-5 px-6 text-[13px] font-bold text-text-foreground">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: row.color }}
+                {hasData ? (
+                  data.modes.map((row) => (
+                    <tr
+                      key={row.id}
+                      className="hover:bg-surface-alt/50 transition-colors"
+                    >
+                      <td className="py-5 px-6 text-[13px] font-bold text-text-foreground">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: row.color }}
+                          />
+                          {row.mode}
+                        </div>
+                      </td>
+                      <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-center">
+                        {row.transactions}
+                      </td>
+                      <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-right">
+                        {formatFCFA(row.amount)}
+                      </td>
+                      <td className="py-5 px-6 text-right">
+                        <span
+                          className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[11px] font-bold"
+                          style={{
+                            backgroundColor: `${row.color}15`,
+                            color: row.color,
+                          }}
+                        >
+                          {row.share}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="p-0">
+                      <div className="bg-white">
+                        <EmptyState
+                          icon={CreditCard}
+                          title="Aucun paiement enregistré"
+                          description="Le détail des transactions par mode de règlement s'affichera ici dès que des ventes auront été encaissées."
                         />
-                        {row.mode}
                       </div>
                     </td>
-                    <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-center">
-                      {row.transactions}
-                    </td>
-                    <td className="py-5 px-6 text-[13px] font-bold text-slate-900 text-right">
-                      {formatFCFA(row.amount)}
-                    </td>
-                    <td className="py-5 px-6 text-right">
-                      <span
-                        className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[11px] font-bold"
-                        style={{
-                          backgroundColor: `${row.color}15`,
-                          color: row.color,
-                        }}
-                      >
-                        {row.share}%
-                      </span>
-                    </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
@@ -95,61 +110,73 @@ export function PaymentsReport({ data }: PaymentsReportProps) {
             <p className="text-[11px] font-medium text-text-muted mt-0.5">Par mode de règlement - août 2026</p>
           </div>
           
-          <div className="w-full h-[220px] relative mb-6">
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-[10px] font-bold text-text-placeholder uppercase tracking-wider mb-0.5">Total</span>
-              <span className="text-[16px] font-bold text-text-foreground whitespace-nowrap">{formatFCFA(totalAmount)}</span>
-            </div>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data.modes}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={70}
-                  outerRadius={95}
-                  paddingAngle={2}
-                  dataKey="amount"
-                  stroke="none"
-                >
-                  {data.modes.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: "12px",
-                    border: "none",
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-                  }}
-                  itemStyle={{ fontSize: "12px", fontWeight: 700 }}
-                  labelStyle={{ display: "none" }}
-                  formatter={(
-                    value: string | number | readonly (string | number)[] | undefined,
-                    name: string | number | undefined,
-                    props: { payload?: { fill?: string } }
-                  ) => [
-                      formatFCFA(Number(value || 0)),
-                      <span key={String(name)} style={{ color: props?.payload?.fill }}>
-                        {name}
-                      </span>,
-                    ]}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="flex flex-col gap-3 mt-auto">
-            {data.modes.map((row) => (
-              <div key={row.id} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: row.color }} />
-                  <span className="text-[12px] font-medium text-text-muted">{row.mode}</span>
+          {hasData ? (
+            <>
+              <div className="w-full h-[220px] relative mb-6">
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-[10px] font-bold text-text-placeholder uppercase tracking-wider mb-0.5">Total</span>
+                  <span className="text-[16px] font-bold text-text-foreground whitespace-nowrap">{formatFCFA(totalAmount)}</span>
                 </div>
-                <span className="text-[12px] font-bold" style={{ color: row.color }}>{row.share}%</span>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data.modes}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={70}
+                      outerRadius={95}
+                      paddingAngle={2}
+                      dataKey="amount"
+                      stroke="none"
+                    >
+                      {data.modes.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: "12px",
+                        border: "none",
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                      }}
+                      itemStyle={{ fontSize: "12px", fontWeight: 700 }}
+                      labelStyle={{ display: "none" }}
+                      formatter={(
+                        value: string | number | readonly (string | number)[] | undefined,
+                        name: string | number | undefined,
+                        props: { payload?: { fill?: string } }
+                      ) => [
+                          formatFCFA(Number(value || 0)),
+                          <span key={String(name)} style={{ color: props?.payload?.fill }}>
+                            {name}
+                          </span>,
+                        ]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
-            ))}
-          </div>
+
+              <div className="flex flex-col gap-3 mt-auto">
+                {data.modes.map((row) => (
+                  <div key={row.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: row.color }} />
+                      <span className="text-[12px] font-medium text-text-muted">{row.mode}</span>
+                    </div>
+                    <span className="text-[12px] font-bold" style={{ color: row.color }}>{row.share}%</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <EmptyState
+                icon={PieChartIcon}
+                title="Rien à répartir pour l'instant"
+                description="Le graphique de répartition des paiements apparaîtra ici dès vos premières ventes."
+              />
+            </div>
+          )}
         </div>
 
       </div>

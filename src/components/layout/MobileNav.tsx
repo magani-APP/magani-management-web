@@ -64,6 +64,10 @@ export function MobileNav() {
     setIsLoggingOut(true);
     try {
       await logout();
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[Logout]", error);
+      }
     } finally {
       router.replace("/login");
     }
